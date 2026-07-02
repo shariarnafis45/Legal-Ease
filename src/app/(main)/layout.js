@@ -1,6 +1,7 @@
 import { Syne, Poppins } from "next/font/google";
 import "@/app/globals.css";
 import Navbar from "../components/shared/NavBar";
+import { ThemeProvider } from "next-themes";
 
 const syne = Syne({
   subsets: ["latin"],
@@ -22,10 +23,14 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en">
-      <body className={`${syne.variable} ${poppins.variable}`}>
-        <Navbar/>
-        <main>{children}</main>
+    <html lang="en" class="light" data-theme="light">
+      <body
+        className={`${syne.variable} ${poppins.variable} bg-background text-foreground`}
+      >
+        <ThemeProvider>
+          <Navbar />
+          <main>{children}</main>
+        </ThemeProvider>
       </body>
     </html>
   );

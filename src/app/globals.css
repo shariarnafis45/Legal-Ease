@@ -4,6 +4,8 @@
 :root {
   --font-heading: var(--font-syne);
   --font-body: var(--font-poppins);
+  --accent: oklch(0.7 0.25 260);
+  --success: oklch(0.65 0.15 155);
 }
 
 body {

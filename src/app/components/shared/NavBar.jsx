@@ -17,8 +17,10 @@ import {
   HelpCircle,
 } from "lucide-react";
 
-import ThemeSwitch from "../ui/ThemeSwitch";
+
 import { drawerVariants } from "../animations/Animations";
+import ThemeSwitch from "../ui/ThemeSwitch";
+
 
 // Mock Navigation Data
 const navLinks = [
