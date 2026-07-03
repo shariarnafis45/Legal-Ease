@@ -2,6 +2,7 @@ import { Syne, Poppins } from "next/font/google";
 import "@/app/globals.css";
 import Navbar from "../components/shared/NavBar";
 import { ThemeProvider } from "next-themes";
+import Footer from "../components/shared/Footer";
 
 const syne = Syne({
   subsets: ["latin"],
@@ -30,6 +31,7 @@ export default function RootLayout({ children }) {
         <ThemeProvider>
           <Navbar />
           <main>{children}</main>
+          <Footer/>
         </ThemeProvider>
       </body>
     </html>
