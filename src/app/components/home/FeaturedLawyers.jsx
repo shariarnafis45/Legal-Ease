@@ -99,7 +99,7 @@ export default function FeaturedLawyers() {
   ];
 
   return (
-    <section className="w-full py-16 px-4 sm:px-6 lg:px-8 max-w-[1440px] mx-auto bg-[#F8FAFC] dark:bg-[#020617] transition-colors duration-300">
+    <section className="w-full py-20 px-4 sm:px-6 lg:px-8 max-w-[1440px] mx-auto bg-white dark:bg-[#030712] transition-colors duration-300">
       
       {/* Top Header Row Panel matching layout parameters */}
       <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-12 pb-2">

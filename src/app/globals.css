@@ -20,3 +20,8 @@ h5,
 h6 {
   font-family: var(--font-heading);
 }
+@layer utilities {
+  .clip-ribbon-tail {
+    clip-path: polygon(0% 0%, 100% 0%, 100% 100%, 50% 75%, 0% 100%);
+  }
+}
