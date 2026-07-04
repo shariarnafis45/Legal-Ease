@@ -3,6 +3,7 @@ import "@/app/globals.css";
 import Navbar from "../components/shared/NavBar";
 import { ThemeProvider } from "next-themes";
 import Footer from "../components/shared/Footer";
+import { Toaster } from "react-hot-toast";
 
 const syne = Syne({
   subsets: ["latin"],
@@ -33,6 +34,7 @@ export default function RootLayout({ children }) {
           <main>{children}</main>
           <Footer/>
         </ThemeProvider>
+        <Toaster/>
       </body>
     </html>
   );

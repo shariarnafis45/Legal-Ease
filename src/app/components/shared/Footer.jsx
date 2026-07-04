@@ -92,7 +92,7 @@ export default function Footer() {
           {/* Brand Engine Info Section */}
           <div className="lg:col-span-4 flex flex-col gap-5">
             <Link href="/" className="flex items-center gap-3 focus-visible:outline-none">
-              <div className="relative h-20 w-20 mt-2 -mr-5">
+              <div className="relative h-10 w-10  ">
                 <Image
                   src={Logo}
                   alt="LegalEase Identity Logo"

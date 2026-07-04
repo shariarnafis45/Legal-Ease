@@ -62,7 +62,7 @@ export default function Navbar({ user = null, handleLogout = () => {} }) {
             href="/"
             className="flex flex-shrink-0 items-center gap-3 focus-visible:outline-none"
           >
-            <div className="relative h-11 w-20 -mr-5 transition-transform duration-200 hover:scale-105">
+            <div className="relative h-10 w-10  transition-transform duration-200 hover:scale-105">
               <Image
                 src={Logo}
                 alt="LegalEase Symbol Logo"
