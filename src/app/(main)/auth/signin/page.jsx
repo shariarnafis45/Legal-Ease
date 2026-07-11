@@ -19,6 +19,7 @@ import { FcGoogle } from "react-icons/fc";
 import Image from "next/image";
 import { authClient } from "@/lib/auth-client";
 import { useRouter } from "next/navigation";
+import GoogleSignInButton from "@/app/components/auth/GoogleSignInButton";
 
 export default function SignInPage() {
   const [formData, setFormData] = useState({
@@ -250,13 +251,7 @@ export default function SignInPage() {
                 <div className="flex-1 h-px bg-slate-200 dark:bg-slate-800"></div>
               </div>
 
-              <button
-                type="button"
-                className="w-full bg-white dark:bg-[#050B14] hover:bg-slate-50 dark:hover:bg-[#0a1222] text-slate-700 dark:text-slate-200 font-bold text-sm py-3.5 border border-slate-200 dark:border-slate-800 rounded-xl transition-all flex items-center justify-center gap-3 active:scale-[0.98]"
-              >
-                <FcGoogle size={20} />
-                <span>Continue with Google</span>
-              </button>
+             <GoogleSignInButton/>
             </div>
 
             <p className="text-center text-sm font-medium text-slate-500 dark:text-slate-400 pt-2">
