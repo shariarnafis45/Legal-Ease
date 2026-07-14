@@ -507,7 +507,7 @@ export default function SignUpPage() {
             <p className="text-center text-sm font-medium text-slate-500 dark:text-slate-400 pt-2">
               Already a member?{" "}
               <Link
-                href="/login"
+                href="/auth/signin"
                 className="text-[#0F766E] dark:text-teal-400 hover:underline font-bold"
               >
                 Sign In
