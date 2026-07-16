@@ -9,7 +9,7 @@ import { authClient } from "@/lib/auth-client";
 
 export default function GoogleSignInButton({
   text = "Continue with Google",
-  callbackURL = "/dashboard",
+  callbackURL = "/",
 }) {
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
 

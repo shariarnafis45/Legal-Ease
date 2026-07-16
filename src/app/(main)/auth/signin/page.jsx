@@ -114,7 +114,7 @@ export default function SignInPage() {
 
         setTimeout(() => {
           setIsLoading(false);
-          router.push("/dashboard");
+          router.push("/");
         }, 1500);
       }
 

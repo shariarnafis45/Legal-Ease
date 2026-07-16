@@ -15,34 +15,76 @@ import {
   ShieldCheck,
   Briefcase,
   HelpCircle,
+  LayoutDashboard,
 } from "lucide-react";
 
-
-import { drawerVariants } from "../animations/Animations";
+import { drawerVariants, dropdownVariants } from "../animations/Animations";
 import ThemeSwitch from "../ui/ThemeSwitch";
+import { authClient } from "@/lib/auth-client";
+import { FaCircleCheck, FaXmark } from "react-icons/fa6";
+import toast from "react-hot-toast";
 
+export default function Navbar() {
+  const navLinks = [
+    { name: "Home", href: "/", active: true },
+    { name: "Browse Lawyers", href: "/lawyers", active: false },
+    
+  ];
 
-// Mock Navigation Data
-const navLinks = [
-  { name: "Home", href: "/", active: true },
-  { name: "Browse Lawyers", href: "/lawyers", active: false },
-  { name: "Dashboard", href: "/dashboard", active: false, hasDropdown: true },
-];
-
-const privateLinks = [
-  { name: "My Profile", href: "/dashboard/profile", icon: User },
-  { name: "Case Manager", href: "/dashboard/cases", icon: Briefcase },
-  { name: "Security Settings", href: "/dashboard/security", icon: ShieldCheck },
-  { name: "Help & Support", href: "/dashboard/support", icon: HelpCircle },
-];
-
-export default function Navbar({ user = null, handleLogout = () => {} }) {
+  const privateLinks = [
+    { name: "My Profile", href: "/dashboard/profile", icon: User },
+  ];
   const [open, setOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const dropdownRef = useRef(null);
+  const { data: session } = authClient.useSession();
+  const user = session?.user || null;
 
-  // Close profile context drop-down menu when clicking outside component bounds
+  const handleLogout = async () => {
+    await authClient.signOut();
+    toast.custom(
+      (t) => (
+        <div
+          className={`${t.visible ? "animate-enter" : "animate-leave"} max-w-md w-full bg-white dark:bg-[#0B1324] shadow-2xl rounded-2xl pointer-events-auto flex border border-emerald-500/30 p-4 transition-all duration-300`}
+        >
+          <div className="flex items-start gap-3 w-full">
+            <FaCircleCheck className="text-emerald-500 text-xl flex-shrink-0 mt-0.5" />
+            <div className="flex-1 text-left">
+              <p className="text-sm font-bold text-slate-800 dark:text-white">
+                Logged out successfully
+              </p>
+              <p className="text-xs font-medium text-slate-500 dark:text-slate-400 mt-0.5">
+                See you again soon!
+              </p>
+            </div>
+            <button
+              onClick={() => toast.dismiss(t.id)}
+              className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
+            >
+              <FaXmark size={16} />
+            </button>
+          </div>
+        </div>
+      ),
+      { duration: 4000 },
+    );
+  };
+
+  const dashboardLinks = {
+    client: "/dashboard/client",
+    lawyer: "/dashboard/lawyer",
+    admin: "/dashboard/admin",
+  };
+
+  if (user?.email) {
+    privateLinks.push({
+      name: "Dashboard",
+      href: dashboardLinks[user?.userType || "client"],
+      icon: LayoutDashboard,
+    });
+  }
+
   useEffect(() => {
     function handleClickOutside(event) {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
