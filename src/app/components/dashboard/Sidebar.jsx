@@ -3,38 +3,118 @@
 import React, { useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { 
-  LuLayoutDashboard, 
-  LuBriefcase, 
-  LuUser, 
-  LuMessageSquare, 
+import {
+  LayoutDashboard,
+  History,
+  User,
+  MessageSquare,
+  ClipboardList,
+  Scale,
+  Users,
+  Banknote,
+  BarChart3,
+} from "lucide-react";
+import {
+  LuLayoutDashboard,
+  LuBriefcase,
+  LuUser,
+  LuMessageSquare,
   LuLogOut,
   LuChevronRight,
-  LuChevronsLeft
+  LuChevronsLeft,
 } from "react-icons/lu";
 import { FaBuildingColumns } from "react-icons/fa6";
 import { useSidebar } from "@/app/context/SidebarContext";
+import { authClient } from "@/lib/auth-client";
 
 export default function Sidebar() {
   const pathname = usePathname();
-  const { isCollapsed, setIsCollapsed, isMobileOpen, setIsMobileOpen } = useSidebar();
+  const { isCollapsed, setIsCollapsed, isMobileOpen, setIsMobileOpen } =
+    useSidebar();
 
   useEffect(() => {
     setIsMobileOpen(false);
   }, [pathname, setIsMobileOpen]);
+  const { data: session } = authClient.useSession();
+  const user = session?.user || null;
 
-  const navItems = [
-    { name: "Dashboard", href: "/dashboard/client", icon: LuLayoutDashboard },
-    { name: "Hiring History", href: "/dashboard/client/hiring-history", icon: LuBriefcase },
-    { name: "Update Profile", href: "/dashboard/client/profile", icon: LuUser },
-    { name: "My Comments", href: "/dashboard/client/comments", icon: LuMessageSquare },
+  const clientSidebarLinks = [
+    {
+      name: "Dashboard",
+      href: "/dashboard/client",
+      icon: LayoutDashboard,
+    },
+    {
+      name: "Hiring History",
+      href: "/dashboard/client/hiring-history",
+      icon: History,
+    },
+    {
+      name: "My Comments",
+      href: "/dashboard/client/comments",
+      icon: MessageSquare,
+    },
+    {
+      name: "Update Profile",
+      href: "/dashboard/client/update-profile",
+      icon: User,
+    },
   ];
+
+  const lawyerSidebarLinks = [
+    {
+      name: "Dashboard",
+      href: "/dashboard/lawyer",
+      icon: LayoutDashboard,
+    },
+    {
+      name: "Hiring Requests",
+      href: "/dashboard/lawyer/hiring-history",
+      icon: ClipboardList,
+    },
+    {
+      name: "Manage Services",
+      href: "/dashboard/lawyer/manage-legal-profile",
+      icon: Scale,
+    },
+  ];
+
+  const adminSidebarLinks = [
+    {
+      name: "Dashboard",
+      href: "/dashboard/admin",
+      icon: LayoutDashboard,
+    },
+    {
+      name: "Manage Users",
+      href: "/dashboard/admin/manage-users",
+      icon: Users,
+    },
+    {
+      name: "All Transactions",
+      href: "/dashboard/admin/all-transactions",
+      icon: Banknote,
+    },
+    {
+      name: "Analytics",
+      href: "/dashboard/admin/analytics",
+      icon: BarChart3,
+    },
+  ];
+
+  const sidebarLinksByRole = {
+    client: clientSidebarLinks,
+    lawyer: lawyerSidebarLinks,
+    admin: adminSidebarLinks,
+  };
+
+  const navItems = sidebarLinksByRole[user?.userType || "client"];
 
   return (
     <>
       {/* Mobile Backdrop Overlay */}
       {isMobileOpen && (
-        <div 
+        <div
           className="fixed inset-0 bg-black/60 z-40 md:hidden backdrop-blur-sm transition-opacity"
           onClick={() => setIsMobileOpen(false)}
         />
@@ -55,26 +135,34 @@ export default function Sidebar() {
               </div>
               {!isCollapsed && (
                 <div className="whitespace-nowrap">
-                  <h1 className="font-extrabold text-lg text-slate-900 dark:text-white leading-none tracking-tight">LegalEase</h1>
-                  <p className="text-[10px] text-slate-500 dark:text-slate-400 font-bold mt-0.5 tracking-wide">Your Legal Partner</p>
+                  <h1 className="font-extrabold text-lg text-slate-900 dark:text-white leading-none tracking-tight">
+                    LegalEase
+                  </h1>
+                  <p className="text-[10px] text-slate-500 dark:text-slate-400 font-bold mt-0.5 tracking-wide">
+                    Your Legal Partner
+                  </p>
                 </div>
               )}
             </Link>
-            
-            <button 
+
+            <button
               onClick={() => setIsCollapsed(!isCollapsed)}
               className="hidden md:flex p-1.5 text-slate-400 hover:text-slate-800 dark:hover:text-white rounded-lg transition-colors"
             >
-              <LuChevronsLeft size={20} className={`transition-transform duration-300 ${isCollapsed ? "rotate-180" : ""}`} />
+              <LuChevronsLeft
+                size={20}
+                className={`transition-transform duration-300 ${isCollapsed ? "rotate-180" : ""}`}
+              />
             </button>
           </div>
 
           {/* 🌟 Navigation Links */}
           <nav className="p-4 space-y-2 mt-2">
             {navItems.map((item) => {
-              const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`);
+              const isActive =
+                pathname === item.href || pathname.startsWith(`${item.href}/`);
               const Icon = item.icon;
-              
+
               return (
                 <Link
                   key={item.name}
@@ -88,10 +176,17 @@ export default function Sidebar() {
                 >
                   <div className="flex items-center gap-3.5">
                     <Icon size={20} className="shrink-0" />
-                    {!isCollapsed && <span className="text-[14px] whitespace-nowrap">{item.name}</span>}
+                    {!isCollapsed && (
+                      <span className="text-[14px] whitespace-nowrap">
+                        {item.name}
+                      </span>
+                    )}
                   </div>
                   {!isCollapsed && isActive && (
-                    <LuChevronRight size={18} className="text-white opacity-80" />
+                    <LuChevronRight
+                      size={18}
+                      className="text-white opacity-80"
+                    />
                   )}
                 </Link>
               );
@@ -106,7 +201,9 @@ export default function Sidebar() {
             title={isCollapsed ? "Logout" : ""}
           >
             <LuLogOut size={20} className="shrink-0" />
-            {!isCollapsed && <span className="text-[14px] whitespace-nowrap">Logout</span>}
+            {!isCollapsed && (
+              <span className="text-[14px] whitespace-nowrap">Logout</span>
+            )}
           </button>
         </div>
       </aside>

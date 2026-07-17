@@ -21,14 +21,12 @@ import {
 import { drawerVariants, dropdownVariants } from "../animations/Animations";
 import ThemeSwitch from "../ui/ThemeSwitch";
 import { authClient } from "@/lib/auth-client";
-import { FaCircleCheck, FaXmark } from "react-icons/fa6";
 import toast from "react-hot-toast";
 
 export default function Navbar() {
   const navLinks = [
     { name: "Home", href: "/", active: true },
     { name: "Browse Lawyers", href: "/lawyers", active: false },
-    
   ];
 
   const privateLinks = [
@@ -43,13 +41,22 @@ export default function Navbar() {
 
   const handleLogout = async () => {
     await authClient.signOut();
+
     toast.custom(
       (t) => (
         <div
-          className={`${t.visible ? "animate-enter" : "animate-leave"} max-w-md w-full bg-white dark:bg-[#0B1324] shadow-2xl rounded-2xl pointer-events-auto flex border border-emerald-500/30 p-4 transition-all duration-300`}
+          className={`max-w-md w-full bg-white dark:bg-[#0B1324] shadow-2xl rounded-2xl pointer-events-auto flex border border-emerald-500/30 p-4 transition-all duration-300 ease-in-out ${
+            t.visible
+              ? "opacity-100 scale-100"
+              : "opacity-0 scale-95 pointer-events-none"
+          }`}
         >
           <div className="flex items-start gap-3 w-full">
-            <FaCircleCheck className="text-emerald-500 text-xl flex-shrink-0 mt-0.5" />
+            <ShieldCheck
+              className="text-emerald-500 text-xl flex-shrink-0 mt-0.5"
+              size={20}
+            />
+
             <div className="flex-1 text-left">
               <p className="text-sm font-bold text-slate-800 dark:text-white">
                 Logged out successfully
@@ -58,19 +65,19 @@ export default function Navbar() {
                 See you again soon!
               </p>
             </div>
+
             <button
               onClick={() => toast.dismiss(t.id)}
-              className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
+              className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors"
             >
-              <FaXmark size={16} />
+              <X size={16} />
             </button>
           </div>
         </div>
       ),
-      { duration: 4000 },
+      { duration: 2000 },
     );
   };
-
   const dashboardLinks = {
     client: "/dashboard/client",
     lawyer: "/dashboard/lawyer",
