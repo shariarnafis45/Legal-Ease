@@ -5,6 +5,8 @@ import Link from "next/link";
 import Image from "next/image";
 import Logo from "@/asset/logo.png";
 import { motion, AnimatePresence } from "framer-motion";
+
+import { usePathname } from "next/navigation";
 import {
   Search,
   ChevronDown,
@@ -13,8 +15,6 @@ import {
   LogOut,
   User,
   ShieldCheck,
-  Briefcase,
-  HelpCircle,
   LayoutDashboard,
 } from "lucide-react";
 
@@ -24,14 +24,21 @@ import { authClient } from "@/lib/auth-client";
 import toast from "react-hot-toast";
 
 export default function Navbar() {
+  const pathname = usePathname();
+
   const navLinks = [
-    { name: "Home", href: "/", active: true },
-    { name: "Browse Lawyers", href: "/lawyers", active: false },
+    { name: "Home", href: "/", active: pathname === "/" },
+    {
+      name: "Browse Lawyers",
+      href: "/lawyers",
+      active: pathname.startsWith("/lawyers"),
+    },
   ];
 
   const privateLinks = [
     { name: "My Profile", href: "/dashboard/profile", icon: User },
   ];
+
   const [open, setOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
@@ -78,6 +85,7 @@ export default function Navbar() {
       { duration: 2000 },
     );
   };
+
   const dashboardLinks = {
     client: "/dashboard/client",
     lawyer: "/dashboard/lawyer",
@@ -85,11 +93,13 @@ export default function Navbar() {
   };
 
   if (user?.email) {
-    privateLinks.push({
-      name: "Dashboard",
-      href: dashboardLinks[user?.userType || "client"],
-      icon: LayoutDashboard,
-    });
+    if (!privateLinks.some((link) => link.name === "Dashboard")) {
+      privateLinks.push({
+        name: "Dashboard",
+        href: dashboardLinks[user?.userType || "client"],
+        icon: LayoutDashboard,
+      });
+    }
   }
 
   useEffect(() => {
@@ -141,12 +151,7 @@ export default function Navbar() {
                     : "text-slate-600 hover:text-slate-950 dark:text-slate-300 dark:hover:text-white"
                 }`}
               >
-                <div className="flex items-center gap-1">
-                  {link.name}
-                  {link.hasDropdown && (
-                    <ChevronDown size={12} className="opacity-70" />
-                  )}
-                </div>
+                <div className="flex items-center gap-1">{link.name}</div>
                 {link.active && (
                   <motion.div
                     layoutId="activeUnderline"
@@ -189,7 +194,6 @@ export default function Navbar() {
             <div className="h-5 w-px bg-slate-200 dark:bg-white/10" />
 
             {user ? (
-              /* --- Profile Dropdown Trigger (Authenticated Layout View) --- */
               <div className="relative" ref={dropdownRef}>
                 <div
                   onClick={() => setIsDropdownOpen(!isDropdownOpen)}
@@ -234,7 +238,6 @@ export default function Navbar() {
                   />
                 </div>
 
-                {/* Account Interaction Canvas Overlay Dropdown */}
                 <AnimatePresence>
                   {isDropdownOpen && (
                     <motion.div
@@ -317,7 +320,6 @@ export default function Navbar() {
                 </AnimatePresence>
               </div>
             ) : (
-              /* --- Neutral Actions Configuration (Guest Mode View) --- */
               <div className="flex items-center gap-2">
                 <Link
                   href="/auth/signin"
@@ -340,12 +342,12 @@ export default function Navbar() {
             )}
           </div>
 
-          {/* Compact View Navigation Drawer Launcher (Mobile Interface Viewport) */}
+          {/* Compact View Navigation Drawer Launcher (Mobile) */}
           <div className="flex items-center gap-2 md:hidden">
             <ThemeSwitch />
             <button
               onClick={() => setOpen(!open)}
-              aria-label="Toggle structural platform menu drawer"
+              aria-label="Toggle menu"
               className="
                 flex h-10 w-10 items-center justify-center rounded-xl
                 border border-slate-200/80 bg-white text-slate-700 transition-all duration-200
@@ -358,7 +360,7 @@ export default function Navbar() {
         </div>
       </div>
 
-      {/* --- Mobile View System Navigation Drawer Overlay --- */}
+      {/* Mobile View Drawer */}
       <AnimatePresence>
         {open && (
           <motion.div
@@ -369,7 +371,6 @@ export default function Navbar() {
             className="md:hidden overflow-hidden border-t border-slate-200/60 bg-white/95 dark:border-white/5 dark:bg-slate-950/95"
           >
             <div className="px-4 py-4 space-y-4">
-              {/* Internal Mobile Contextual Search Field Container */}
               <div className="relative w-full">
                 <Search
                   size={14}
@@ -382,7 +383,6 @@ export default function Navbar() {
                 />
               </div>
 
-              {/* Dynamic User Profile Context Header */}
               {user && (
                 <div className="flex items-center gap-3 pb-3 border-b border-slate-200/60 dark:border-white/5">
                   <div className="relative h-10 w-10 overflow-hidden rounded-lg">
@@ -410,7 +410,6 @@ export default function Navbar() {
                 </div>
               )}
 
-              {/* Base Platform Interfacing Links */}
               <div className="flex flex-col gap-1">
                 <span className="px-3 mb-1 font-poppins text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
                   Navigation
@@ -420,14 +419,17 @@ export default function Navbar() {
                     key={item.href}
                     href={item.href}
                     onClick={() => setOpen(false)}
-                    className="rounded-xl px-3 py-2.5 font-poppins text-xs font-medium text-slate-700 transition-colors hover:bg-slate-50 dark:text-slate-300 dark:hover:bg-white/5"
+                    className={`rounded-xl px-3 py-2.5 font-poppins text-xs font-medium transition-colors ${
+                      item.active
+                        ? "bg-slate-100 text-[#0F766E] dark:bg-white/5 dark:text-teal-400"
+                        : "text-slate-700 hover:bg-slate-50 dark:text-slate-300 dark:hover:bg-white/5"
+                    }`}
                   >
                     {item.name}
                   </Link>
                 ))}
               </div>
 
-              {/* Secure Interface Switch Engine Controls */}
               {user ? (
                 <div className="flex flex-col gap-1 pt-2 border-t border-slate-200/60 dark:border-white/5">
                   <span className="px-3 mb-1 font-poppins text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">

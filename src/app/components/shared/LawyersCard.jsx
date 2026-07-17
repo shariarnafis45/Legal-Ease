@@ -4,24 +4,27 @@ import React from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { motion } from "framer-motion";
-import { FaStar, FaUserCheck, FaArrowRight, FaLocationDot, FaBriefcase } from "react-icons/fa6";
+import {
+  FaStar,
+  FaUserCheck,
+  FaArrowRight,
+  FaLocationDot,
+  FaBriefcase,
+} from "react-icons/fa6";
 import { hoverScale } from "../animations/Animations";
 
-
 export default function LawyerCard({ lawyer, index }) {
+  const isAvailable = lawyer.status === "Available";
+
   return (
     <motion.div
-     
       initial={{ opacity: 0, y: 24 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-40px" }}
       transition={{ duration: 0.4, ease: "easeOut", delay: index * 0.1 }}
-      
-     
       variants={hoverScale}
       whileHover="hover"
       whileTap="tap"
-      
       className="
         group relative flex flex-col bg-white border border-slate-200/60 p-6 rounded-[28px] w-full
         dark:bg-[#0b1329] dark:border-slate-900/60 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.01)]
@@ -29,29 +32,59 @@ export default function LawyerCard({ lawyer, index }) {
         transition-colors duration-300
       "
     >
-      
       {/* Top Header Row inside Card */}
       <div className="flex items-center justify-between w-full mb-5">
-        {lawyer.verified ? (
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#EBF6F4] border border-teal-100/50 dark:bg-teal-950/40 dark:border-teal-900/30">
-            <FaUserCheck className="text-[#0F766E] dark:text-teal-400 text-[10px]" />
-            <span className="font-poppins text-[10px] font-bold text-[#0F766E] dark:text-teal-400 tracking-wide uppercase">
-              Verified
-            </span>
-          </div>
-        ) : (
-          <div className="w-1" />
-        )}
+        <div className="flex items-center gap-2 flex-wrap">
+          {lawyer.verified && (
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#EBF6F4] border border-teal-100/50 dark:bg-teal-950/40 dark:border-teal-900/30">
+              <FaUserCheck className="text-[#0F766E] dark:text-teal-400 text-[10px]" />
+              <span className="font-poppins text-[10px] font-bold text-[#0F766E] dark:text-teal-400 tracking-wide uppercase">
+                Verified
+              </span>
+            </div>
+          )}
+
+          {/* New Status Badge */}
+          {lawyer.status && (
+            <div
+              className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full border ${
+                isAvailable
+                  ? "bg-emerald-50 border-emerald-100/50 dark:bg-emerald-950/30 dark:border-emerald-900/30"
+                  : "bg-orange-50 border-orange-100/50 dark:bg-orange-950/30 dark:border-orange-900/30"
+              }`}
+            >
+              <span className={`relative flex h-1.5 w-1.5`}>
+                {isAvailable && (
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                )}
+                <span
+                  className={`relative inline-flex rounded-full h-1.5 w-1.5 ${
+                    isAvailable ? "bg-emerald-500" : "bg-orange-500"
+                  }`}
+                ></span>
+              </span>
+              <span
+                className={`font-poppins text-[10px] font-bold tracking-wide uppercase ${
+                  isAvailable
+                    ? "text-emerald-700 dark:text-emerald-400"
+                    : "text-orange-700 dark:text-orange-400"
+                }`}
+              >
+                {lawyer.status}
+              </span>
+            </div>
+          )}
+        </div>
 
         {/* Hires Count Metric Tracker */}
-        <div className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl bg-slate-50 dark:bg-slate-950 text-slate-400 dark:text-slate-500 font-poppins text-[11px] font-semibold">
+        <div className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl bg-slate-50 dark:bg-slate-950 text-slate-400 dark:text-slate-500 font-poppins text-[11px] font-semibold shrink-0">
           <FaBriefcase size={10} className="text-slate-400" />
-          <span>{lawyer.totalHires}+ Hires</span>
+          <span>{lawyer.totalHires}+</span>
         </div>
       </div>
 
       {/* Main Identity Grid Structure */}
-      <div className="flex items-center gap-5 w-full mb-6">
+      <div className="flex items-center gap-4 w-full mb-6">
         <div className="relative w-20 h-20 shrink-0 rounded-full p-1 bg-gradient-to-b from-slate-100 to-transparent dark:from-slate-800">
           <div className="relative w-full h-full rounded-full overflow-hidden border-2 border-white dark:border-slate-950">
             <Image
@@ -73,8 +106,13 @@ export default function LawyerCard({ lawyer, index }) {
           </span>
           {/* Location Badge */}
           <div className="flex items-center gap-1 text-slate-400 dark:text-slate-600 mt-1">
-            <FaLocationDot size={9} className="text-slate-300 dark:text-slate-700" />
-            <span className="font-poppins text-[10px] font-medium tracking-wide">{lawyer.location}</span>
+            <FaLocationDot
+              size={9}
+              className="text-slate-300 dark:text-slate-700"
+            />
+            <span className="font-poppins text-[10px] font-medium tracking-wide truncate">
+              {lawyer.location}
+            </span>
           </div>
         </div>
       </div>
@@ -116,7 +154,7 @@ export default function LawyerCard({ lawyer, index }) {
       </div>
 
       {/* Ultra Cool Inset Sliding Liquid Button Action Trigger */}
-      <Link 
+      <Link
         href={`/lawyers/${lawyer._id}`}
         className="
           relative overflow-hidden w-full inline-flex items-center justify-center gap-2 py-3 px-4 rounded-xl 
@@ -127,12 +165,11 @@ export default function LawyerCard({ lawyer, index }) {
       >
         <span className="absolute inset-y-0 left-0 w-full bg-[#0F766E] dark:bg-teal-600 scale-x-0 group-hover:scale-x-100 origin-left transition-transform duration-300 ease-out -z-10 rounded-[10px]" />
         <span className="group-hover:text-white">View Full Profile</span>
-        <FaArrowRight 
-          size={11} 
-          className="transform transition-transform duration-300 group-hover:translate-x-1 text-slate-400 group-hover:text-white" 
+        <FaArrowRight
+          size={11}
+          className="transform transition-transform duration-300 group-hover:translate-x-1 text-slate-400 group-hover:text-white"
         />
       </Link>
-
     </motion.div>
   );
 }

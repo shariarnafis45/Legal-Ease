@@ -3,14 +3,13 @@ import Link from "next/link";
 import { FaArrowRight } from "react-icons/fa6";
 import LawyerCard from "../shared/LawyersCard";
 
-
 export default function FeaturedLawyers() {
   const featuredLawyersData = [
     {
-      _id: "684b9d8c123456781",
       name: "John Anderson",
       email: "john@example.com",
-      image: "https://images.unsplash.com/photo-1560250097-0b93528c311a?q=80&w=400",
+      image:
+        "https://images.unsplash.com/photo-1560250097-0b93528c311a?q=80&w=400",
       specialization: { name: "Corporate Law", slug: "corporate-law" },
       bio: "Experienced corporate lawyer helping businesses with global contracts, financial compliance, and legal asset advisory scaling setup.",
       fee: { amount: 150, currency: "USD" },
@@ -19,13 +18,15 @@ export default function FeaturedLawyers() {
       totalReviews: 120,
       totalHires: 380,
       location: "New York, USA",
-      verified: true
+      verified: true,
+      status: "Available",
+      dateJoined: "2023-05-12T00:00:00.000+00:00",
     },
     {
-      _id: "684b9d8c123456782",
       name: "Sarah Mitchell",
       email: "sarah@example.com",
-      image: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=400",
+      image:
+        "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=400",
       specialization: { name: "Family Law", slug: "family-law" },
       bio: "Compassionate family counsel specializing in complex mediation, asset division, and swift child custody protection frameworks.",
       fee: { amount: 120, currency: "USD" },
@@ -34,13 +35,15 @@ export default function FeaturedLawyers() {
       totalReviews: 98,
       totalHires: 240,
       location: "Chicago, USA",
-      verified: true
+      verified: true,
+      status: "Busy",
+      dateJoined: "2024-01-18T00:00:00.000+00:00",
     },
     {
-      _id: "684b9d8c123456783",
       name: "Michael Brown",
       email: "michael@example.com",
-      image: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=400",
+      image:
+        "https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=400",
       specialization: { name: "Criminal Law", slug: "criminal-law" },
       bio: "Aggressive state and federal criminal defense trial lawyer with an elite track record handling high-stakes defense cases.",
       fee: { amount: 180, currency: "USD" },
@@ -49,13 +52,15 @@ export default function FeaturedLawyers() {
       totalReviews: 150,
       totalHires: 410,
       location: "Los Angeles, USA",
-      verified: true
+      verified: true,
+      status: "Available",
+      dateJoined: "2022-11-05T00:00:00.000+00:00",
     },
     {
-      _id: "684b9d8c123456784",
       name: "Emily Johnson",
       email: "emily@example.com",
-      image: "https://images.unsplash.com/photo-1580489944761-15a19d654956?q=80&w=400",
+      image:
+        "https://images.unsplash.com/photo-1580489944761-15a19d654956?q=80&w=400",
       specialization: { name: "Immigration Law", slug: "immigration-law" },
       bio: "Assisting international individuals and corporate enterprises navigate complex visa structures and citizenship pathways.",
       fee: { amount: 130, currency: "USD" },
@@ -64,13 +69,15 @@ export default function FeaturedLawyers() {
       totalReviews: 86,
       totalHires: 190,
       location: "Miami, USA",
-      verified: true
+      verified: true,
+      status: "Available",
+      dateJoined: "2024-06-22T00:00:00.000+00:00",
     },
     {
-      _id: "684b9d8c123456785",
       name: "David Wilson",
       email: "david@example.com",
-      image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=400",
+      image:
+        "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=400",
       specialization: { name: "Real Estate Law", slug: "real-estate" },
       bio: "Property compliance supervisor auditing deeds, commercial zoning laws, and preventing multi-million real estate fraud gaps.",
       fee: { amount: 140, currency: "USD" },
@@ -79,13 +86,15 @@ export default function FeaturedLawyers() {
       totalReviews: 110,
       totalHires: 310,
       location: "Houston, USA",
-      verified: false
+      verified: false,
+      status: "Busy",
+      dateJoined: "2023-09-14T00:00:00.000+00:00",
     },
     {
-      _id: "684b9d8c123456786",
       name: "Lisa Martinez",
       email: "lisa@example.com",
-      image: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=400",
+      image:
+        "https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=400",
       specialization: { name: "Employment Law", slug: "employment-law" },
       bio: "Dedicated advocate enforcing modern labor compliance, corporate workplace rights audits, and compensation panels.",
       fee: { amount: 120, currency: "USD" },
@@ -94,13 +103,346 @@ export default function FeaturedLawyers() {
       totalReviews: 130,
       totalHires: 290,
       location: "Boston, USA",
-      verified: true
-    }
+      verified: true,
+      status: "Available",
+      dateJoined: "2023-02-28T00:00:00.000+00:00",
+    },
+    {
+      name: "James Taylor",
+      email: "james.taylor@example.com",
+      image:
+        "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=400",
+      specialization: {
+        name: "Intellectual Property",
+        slug: "intellectual-property",
+      },
+      bio: "Patent and trademark strategist securing tech innovations, brand copyrights, and defending digital enterprise properties.",
+      fee: { amount: 200, currency: "USD" },
+      experience: 12,
+      rating: 5.0,
+      totalReviews: 142,
+      totalHires: 520,
+      location: "San Francisco, USA",
+      verified: true,
+      status: "Available",
+      dateJoined: "2022-04-15T00:00:00.000+00:00",
+    },
+    {
+      name: "Amanda Thomas",
+      email: "amanda.t@example.com",
+      image:
+        "https://images.unsplash.com/photo-1534751516642-a131fed10495?q=80&w=400",
+      specialization: { name: "Tax Law", slug: "tax-law" },
+      bio: "Helping corporate clients mitigate financial audit risks, restructuring offshore tax benefits, and handling IRS disputes.",
+      fee: { amount: 165, currency: "USD" },
+      experience: 11,
+      rating: 4.6,
+      totalReviews: 75,
+      totalHires: 210,
+      location: "Seattle, USA",
+      verified: true,
+      status: "Busy",
+      dateJoined: "2024-08-01T00:00:00.000+00:00",
+    },
+    {
+      name: "Robert Moore",
+      email: "robert.m@example.com",
+      image:
+        "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?q=80&w=400",
+      specialization: { name: "Personal Injury", slug: "personal-injury" },
+      bio: "Relentless fighter seeking maximum insurance settlements and medical compensation recovery for severe accident victims.",
+      fee: { amount: 110, currency: "USD" },
+      experience: 4,
+      rating: 4.7,
+      totalReviews: 64,
+      totalHires: 150,
+      location: "Austin, USA",
+      verified: false,
+      status: "Available",
+      dateJoined: "2025-02-10T00:00:00.000+00:00",
+    },
+    {
+      name: "Jessica Jackson",
+      email: "jessica.j@example.com",
+      image:
+        "https://images.unsplash.com/photo-1567532939604-b6b5b0db2604?q=80&w=400",
+      specialization: { name: "Cyber Law", slug: "cyber-law" },
+      bio: "Expert in data privacy compliance, cybersecurity breaches, cloud hosting regulations, and international GDPR disputes.",
+      fee: { amount: 190, currency: "USD" },
+      experience: 7,
+      rating: 4.8,
+      totalReviews: 89,
+      totalHires: 270,
+      location: "Washington DC, USA",
+      verified: true,
+      status: "Available",
+      dateJoined: "2023-10-19T00:00:00.000+00:00",
+    },
+    {
+      name: "William White",
+      email: "william.w@example.com",
+      image:
+        "https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?q=80&w=400",
+      specialization: { name: "Environmental Law", slug: "environmental-law" },
+      bio: "Advising green-tech projects on carbon credit policies, industrial waste disposal audits, and clean energy compliance grids.",
+      fee: { amount: 145, currency: "USD" },
+      experience: 8,
+      rating: 4.5,
+      totalReviews: 53,
+      totalHires: 130,
+      location: "Denver, USA",
+      verified: true,
+      status: "Busy",
+      dateJoined: "2024-03-05T00:00:00.000+00:00",
+    },
+    {
+      name: "Megan Harris",
+      email: "megan.h@example.com",
+      image:
+        "https://images.unsplash.com/photo-1551836022-d5d88e9218df?q=80&w=400",
+      specialization: {
+        name: "Medical Malpractice",
+        slug: "medical-malpractice",
+      },
+      bio: "Representing patients in complex clinical negligence lawsuits, hospital safety violations, and surgical injury claims.",
+      fee: { amount: 175, currency: "USD" },
+      experience: 9,
+      rating: 4.9,
+      totalReviews: 112,
+      totalHires: 340,
+      location: "Philadelphia, USA",
+      verified: true,
+      status: "Available",
+      dateJoined: "2023-07-21T00:00:00.000+00:00",
+    },
+    {
+      name: "Brian Martin",
+      email: "brian.m@example.com",
+      image:
+        "https://images.unsplash.com/photo-1501196354995-cbb51c65aaea?q=80&w=400",
+      specialization: { name: "Bankruptcy Law", slug: "bankruptcy-law" },
+      bio: "Strategic debt restructuring advisor handling Chapter 11 corporate filings and protecting consumer financial assets.",
+      fee: { amount: 135, currency: "USD" },
+      experience: 6,
+      rating: 4.6,
+      totalReviews: 78,
+      totalHires: 180,
+      location: "Las Vegas, USA",
+      verified: false,
+      status: "Available",
+      dateJoined: "2024-09-30T00:00:00.000+00:00",
+    },
+    {
+      name: "Rachel Garcia",
+      email: "rachel.g@example.com",
+      image:
+        "https://images.unsplash.com/photo-1594744803329-e58b31de215f?q=80&w=400",
+      specialization: { name: "Civil Rights", slug: "civil-rights" },
+      bio: "Passionate human rights advocate defending workplace discrimination victims, free speech, and unlawful state detentions.",
+      fee: { amount: 125, currency: "USD" },
+      experience: 5,
+      rating: 4.8,
+      totalReviews: 92,
+      totalHires: 220,
+      location: "Atlanta, USA",
+      verified: true,
+      status: "Busy",
+      dateJoined: "2024-11-12T00:00:00.000+00:00",
+    },
+    {
+      name: "Kevin Martinez",
+      email: "kevin.m@example.com",
+      image:
+        "https://images.unsplash.com/photo-1531427186611-ecfd6d936c79?q=80&w=400",
+      specialization: { name: "Entertainment Law", slug: "entertainment-law" },
+      bio: "Drafting production contracts for filmmakers, syndication licensing deals for musicians, and protection for digital creators.",
+      fee: { amount: 210, currency: "USD" },
+      experience: 11,
+      rating: 4.9,
+      totalReviews: 105,
+      totalHires: 390,
+      location: "Los Angeles, USA",
+      verified: true,
+      status: "Available",
+      dateJoined: "2022-08-24T00:00:00.000+00:00",
+    },
+    {
+      name: "Sophia Robinson",
+      email: "sophia.r@example.com",
+      image:
+        "https://images.unsplash.com/photo-1587614382346-4ec70e388b28?q=80&w=400",
+      specialization: { name: "Maritime Law", slug: "maritime-law" },
+      bio: "Navigating international shipping logistics, ocean trade liability accidents, and deep-sea cargo loss compensation structures.",
+      fee: { amount: 160, currency: "USD" },
+      experience: 8,
+      rating: 4.7,
+      totalReviews: 61,
+      totalHires: 145,
+      location: "New Orleans, USA",
+      verified: true,
+      status: "Available",
+      dateJoined: "2023-12-01T00:00:00.000+00:00",
+    },
+    {
+      name: "Daniel Clark",
+      email: "daniel.c@example.com",
+      image:
+        "https://images.unsplash.com/photo-1628157582853-a796fa650a6a?q=80&w=400",
+      specialization: { name: "Corporate Law", slug: "corporate-law" },
+      bio: "Assisting startups with angel funding legalities, corporate equity distributions, and fast-track venture capital compliance.",
+      fee: { amount: 155, currency: "USD" },
+      experience: 7,
+      rating: 4.8,
+      totalReviews: 84,
+      totalHires: 295,
+      location: "San Jose, USA",
+      verified: true,
+      status: "Busy",
+      dateJoined: "2024-04-10T00:00:00.000+00:00",
+    },
+    {
+      name: "Olivia Lewis",
+      email: "olivia.l@example.com",
+      image:
+        "https://images.unsplash.com/photo-1548142813-c348350df52b?q=80&w=400",
+      specialization: { name: "Family Law", slug: "family-law" },
+      bio: "Providing sensitive counsel for prenuptial treaties, domestic inheritance settlements, and post-divorce financial reviews.",
+      fee: { amount: 115, currency: "USD" },
+      experience: 6,
+      rating: 4.7,
+      totalReviews: 73,
+      totalHires: 195,
+      location: "Phoenix, USA",
+      verified: false,
+      status: "Available",
+      dateJoined: "2024-07-07T00:00:00.000+00:00",
+    },
+    {
+      name: "Matthew Walker",
+      email: "matthew.w@example.com",
+      image:
+        "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?q=80&w=400",
+      specialization: { name: "Criminal Law", slug: "criminal-law" },
+      bio: "Elite defense counsel specializing in white-collar corporate fraud investigations, embezzlement accusations, and tax trials.",
+      fee: { amount: 195, currency: "USD" },
+      experience: 14,
+      rating: 5.0,
+      totalReviews: 188,
+      totalHires: 560,
+      location: "New York, USA",
+      verified: true,
+      status: "Busy",
+      dateJoined: "2021-06-15T00:00:00.000+00:00",
+    },
+    {
+      name: "Isabella Hall",
+      email: "isabella.h@example.com",
+      image:
+        "https://images.unsplash.com/photo-1541364983171-a8ba01d95cfc?q=80&w=400",
+      specialization: { name: "Immigration Law", slug: "immigration-law" },
+      bio: "Dedicated advocate processing asylum protections, temporary work permits, and cross-border tech talent recruitment paths.",
+      fee: { amount: 125, currency: "USD" },
+      experience: 4,
+      rating: 4.6,
+      totalReviews: 50,
+      totalHires: 120,
+      location: "San Diego, USA",
+      verified: true,
+      status: "Available",
+      dateJoined: "2025-01-20T00:00:00.000+00:00",
+    },
+    {
+      name: "Andrew Allen",
+      email: "andrew.a@example.com",
+      image:
+        "https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?q=80&w=400",
+      specialization: { name: "Real Estate Law", slug: "real-estate" },
+      bio: "Drafting multi-unit residential property terms, land acquisition contracts, and resolving local landlord-tenant conflicts.",
+      fee: { amount: 130, currency: "USD" },
+      experience: 5,
+      rating: 4.7,
+      totalReviews: 69,
+      totalHires: 210,
+      location: "Dallas, USA",
+      verified: true,
+      status: "Available",
+      dateJoined: "2024-05-14T00:00:00.000+00:00",
+    },
+    {
+      name: "Mia Young",
+      email: "mia.y@example.com",
+      image:
+        "https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?q=80&w=400",
+      specialization: { name: "Employment Law", slug: "employment-law" },
+      bio: "Managing executive severance negotiations, non-compete corporate policy frameworks, and workplace safety audits.",
+      fee: { amount: 140, currency: "USD" },
+      experience: 8,
+      rating: 4.8,
+      totalReviews: 96,
+      totalHires: 285,
+      location: "Minneapolis, USA",
+      verified: true,
+      status: "Busy",
+      dateJoined: "2023-03-11T00:00:00.000+00:00",
+    },
+    {
+      name: "Ethan King",
+      email: "ethan.king@example.com",
+      image:
+        "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?q=80&w=400",
+      specialization: {
+        name: "Intellectual Property",
+        slug: "intellectual-property",
+      },
+      bio: "Handling biotech patent litigation, open-source software legal audits, and trade secret protection frameworks.",
+      fee: { amount: 185, currency: "USD" },
+      experience: 10,
+      rating: 4.9,
+      totalReviews: 115,
+      totalHires: 310,
+      location: "Portland, USA",
+      verified: true,
+      status: "Available",
+      dateJoined: "2023-08-19T00:00:00.000+00:00",
+    },
+    {
+      name: "Charlotte Wright",
+      email: "charlotte.w@example.com",
+      image:
+        "https://images.unsplash.com/photo-1554151228-14d9def656e4?q=80&w=400",
+      specialization: { name: "Tax Law", slug: "tax-law" },
+      bio: "Advising cryptocurrency investors on capital gains taxation, digital asset regulations, and blockchain compliance.",
+      fee: { amount: 170, currency: "USD" },
+      experience: 9,
+      rating: 4.8,
+      totalReviews: 102,
+      totalHires: 275,
+      location: "Orlando, USA",
+      verified: true,
+      status: "Available",
+      dateJoined: "2023-11-27T00:00:00.000+00:00",
+    },
+    {
+      name: "Joseph Scott",
+      email: "joseph.s@example.com",
+      image:
+        "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?q=80&w=400",
+      specialization: { name: "Personal Injury", slug: "personal-injury" },
+      bio: "Representing clients against giant commercial transport enterprises for logistics logistics highway collision disputes.",
+      fee: { amount: 120, currency: "USD" },
+      experience: 6,
+      rating: 4.7,
+      totalReviews: 81,
+      totalHires: 230,
+      location: "Nashville, USA",
+      verified: false,
+      status: "Busy",
+      dateJoined: "2024-02-14T00:00:00.000+00:00",
+    },
   ];
 
   return (
     <section className="w-full py-20 px-4 sm:px-6 lg:px-8 max-w-[1440px] mx-auto bg-white dark:bg-[#030712] transition-colors duration-300">
-      
       {/* Top Header Row Panel matching layout parameters */}
       <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-12 pb-2">
         <div className="flex flex-col text-left">
@@ -112,7 +454,7 @@ export default function FeaturedLawyers() {
           </p>
         </div>
 
-        <Link 
+        <Link
           href="/lawyers"
           className="inline-flex items-center gap-2 px-5 py-3 bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 text-slate-700 dark:text-slate-200 text-xs font-bold rounded-xl shadow-sm hover:bg-slate-50 dark:hover:bg-slate-800 transition-all duration-200 font-poppins shrink-0 self-start sm:self-auto"
         >
@@ -123,15 +465,10 @@ export default function FeaturedLawyers() {
 
       {/* 3-COLUMN REUSABLE GRID (Server passing index data to handle client staggers) */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        {featuredLawyersData.map((lawyer, index) => (
-          <LawyerCard
-            key={lawyer._id} 
-            lawyer={lawyer} 
-            index={index} 
-          />
+        {featuredLawyersData.slice(0,6).map((lawyer, index) => (
+          <LawyerCard key={lawyer._id} lawyer={lawyer} index={index} />
         ))}
       </div>
-
     </section>
   );
 }
