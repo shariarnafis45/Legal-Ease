@@ -2,225 +2,229 @@
 
 import React, { useState, useMemo, useRef, useEffect } from "react";
 import Link from "next/link";
-import { FaChevronRight, FaSearch, FaSlidersH, FaChevronDown, FaCheck } from "react-icons/fa";
+import { 
+  FaChevronRight, FaSearch, FaChevronDown, FaCheck, 
+  FaBriefcase, FaRegClock, FaMoneyBillWave, FaBalanceScale 
+} from "react-icons/fa";
+import { BiBadgeCheck } from "react-icons/bi";
+import { FiSliders, FiRefreshCcw } from "react-icons/fi";
 import { motion, AnimatePresence } from "framer-motion";
 import LawyerCard from "@/app/components/shared/LawyersCard";
 
 
-// Framer Motion Variants
-const containerVariants = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: { staggerChildren: 0.1, delayChildren: 0.2 },
-  },
-};
-
-const itemVariants = {
-  hidden: { opacity: 0, y: 20 },
-  visible: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 100 } },
-};
-
 export default function LawyersClientWrapper({ initialLawyers }) {
-  // State for filtering & searching
   const [searchQuery, setSearchQuery] = useState("");
   const [sortBy, setSortBy] = useState("Newest");
-  const [specialization, setSpecialization] = useState("All");
+  const [specialization, setSpecialization] = useState("Select Specialization");
   const [availability, setAvailability] = useState([]);
   const [experience, setExperience] = useState([]);
   const [maxFee, setMaxFee] = useState(500);
 
-  // UI States
-  const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false);
   const [isSpecOpen, setIsSpecOpen] = useState(false);
-  
   const specRef = useRef(null);
 
-  // Close custom dropdown on outside click
   useEffect(() => {
     function handleClickOutside(event) {
-      if (specRef.current && !specRef.current.contains(event.target)) {
-        setIsSpecOpen(false);
-      }
+      if (specRef.current && !specRef.current.contains(event.target)) setIsSpecOpen(false);
     }
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const specializationsList = [
-    "All",
-    "Corporate Law",
-    "Family Law",
-    "Criminal Law",
-    "Real Estate Law",
-    "Immigration Law",
-    "Employment Law",
-  ];
+  const specializationsList = ["Corporate Law", "Family Law", "Criminal Law", "Real Estate Law", "Immigration Law", "Employment Law"];
 
-  // Filter & Sort Logic
+  // Filter Logic
   const filteredLawyers = useMemo(() => {
-    let result = [...initialLawyers];
+    let result = [...(initialLawyers || [])];
 
     if (searchQuery) {
       result = result.filter(
         (lawyer) =>
           lawyer.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          lawyer.specialization.name.toLowerCase().includes(searchQuery.toLowerCase())
+          lawyer?.specialization?.name?.toLowerCase().includes(searchQuery.toLowerCase())
       );
     }
-    if (specialization !== "All") {
-      result = result.filter((lawyer) => lawyer.specialization.name === specialization);
+    
+    if (specialization !== "Select Specialization") {
+      result = result.filter((lawyer) => lawyer?.specialization?.name === specialization);
     }
+    
+    // Fixed Availability Filter 
     if (availability.length > 0) {
-      result = result.filter((lawyer) => availability.includes(lawyer.status));
+      result = result.filter((lawyer) => 
+        availability.includes(lawyer.status) || availability.includes(lawyer.availability)
+      );
     }
+
     if (experience.length > 0) {
       result = result.filter((lawyer) => {
-        if (experience.includes("0-2") && lawyer.experience <= 2) return true;
-        if (experience.includes("3-5") && lawyer.experience >= 3 && lawyer.experience <= 5) return true;
-        if (experience.includes("5+") && lawyer.experience > 5) return true;
+        const exp = lawyer.experience || 0;
+        if (experience.includes("0 - 2 Years") && exp <= 2) return true;
+        if (experience.includes("3 - 5 Years") && exp >= 3 && exp <= 5) return true;
+        if (experience.includes("5+ Years") && exp > 5) return true;
         return false;
       });
     }
-    result = result.filter((lawyer) => lawyer.fee.amount <= maxFee);
 
-    if (sortBy === "Newest") {
-      result.sort((a, b) => new Date(b.dateJoined).getTime() - new Date(a.dateJoined).getTime());
-    } else if (sortBy === "Price (Low to High)") {
-      result.sort((a, b) => a.fee.amount - b.fee.amount);
-    } else if (sortBy === "Price (High to Low)") {
-      result.sort((a, b) => b.fee.amount - a.fee.amount);
-    }
+    result = result.filter((lawyer) => (lawyer?.fee?.amount || 0) <= maxFee);
 
     return result;
   }, [initialLawyers, searchQuery, specialization, availability, experience, maxFee, sortBy]);
 
-  // Handlers
-  const toggleAvailability = (status) => {
-    setAvailability((prev) =>
-      prev.includes(status) ? prev.filter((s) => s !== status) : [...prev, status]
-    );
-  };
-
-  const toggleExperience = (range) => {
-    setExperience((prev) =>
-      prev.includes(range) ? prev.filter((r) => r !== range) : [...prev, range]
-    );
-  };
-
   const resetFilters = () => {
-    setSpecialization("All");
+    setSpecialization("Select Specialization");
     setAvailability([]);
     setExperience([]);
     setMaxFee(500);
     setSearchQuery("");
   };
 
-  return (
-    <motion.div 
-      initial={{ opacity: 0 }} 
-      animate={{ opacity: 1 }} 
-      className="w-full"
-    >
-      {/* --- HERO SECTION --- */}
-      <section className="w-full bg-white dark:bg-[#0a0f1c] border-b border-slate-200 dark:border-slate-800/60 pt-10 pb-14 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
-        <div className="absolute right-0 top-0 w-1/2 h-full bg-gradient-to-l from-teal-50/80 dark:from-teal-900/10 to-transparent pointer-events-none" />
-        
-        <div className="max-w-[1440px] mx-auto relative z-10">
-          <motion.div 
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            className="flex items-center text-sm text-slate-500 dark:text-slate-400 mb-6 gap-2 font-medium"
-          >
-            <Link href="/" className="hover:text-teal-600 dark:hover:text-teal-400 transition-colors">Home</Link>
-            <FaChevronRight size={10} />
-            <span className="text-slate-900 dark:text-slate-200">Browse Lawyers</span>
-          </motion.div>
+  const toggleExperience = (range) => {
+    setExperience((prev) => 
+      prev.includes(range) ? prev.filter((r) => r !== range) : [...prev, range]
+    );
+  };
 
-          <motion.div 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
-            className="max-w-2xl"
-          >
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-slate-900 dark:text-white mb-5 tracking-tight leading-tight">
-              Find Your Legal <span className="text-transparent bg-clip-text bg-gradient-to-r from-teal-600 to-emerald-500">Expert</span>
+  // Availability Toggle Handler
+  const toggleAvailability = (status) => {
+    setAvailability((prev) => 
+      prev.includes(status) ? prev.filter((s) => s !== status) : [...prev, status]
+    );
+  };
+
+  return (
+    <div className="w-full bg-[#f8fafc] dark:bg-[#0b1120] min-h-screen pb-20 font-sans transition-colors duration-300">
+      
+      {/* --- HERO SECTION --- */}
+      <section className="relative w-full pt-8 pb-10 px-4 sm:px-6 lg:px-8 overflow-hidden bg-white dark:bg-slate-900 border-b border-slate-100 dark:border-slate-800/80 mb-8 rounded-b-[2.5rem] shadow-[0_4px_20px_-10px_rgba(0,0,0,0.05)] dark:shadow-none">
+        
+        <div className="absolute top-0 right-0 w-[600px] h-[300px] bg-gradient-to-bl from-teal-50/80 to-transparent dark:from-teal-900/10 rounded-bl-full pointer-events-none -z-10" />
+        <div className="absolute bottom-0 left-0 w-[400px] h-[200px] bg-gradient-to-tr from-slate-50 to-transparent dark:from-slate-800/20 rounded-tr-full pointer-events-none -z-10" />
+        
+        <div className="max-w-[1440px] mx-auto flex flex-col md:flex-row items-center justify-between gap-10">
+          
+          {/* Left Text Content */}
+          <div className="max-w-xl z-10">
+            <div className="flex items-center text-xs text-slate-500 dark:text-slate-400 mb-5 gap-2 font-medium uppercase tracking-wider">
+              <Link href="/" className="hover:text-teal-600 dark:hover:text-teal-400 transition-colors">Home</Link>
+              <FaChevronRight size={8} />
+              <span className="text-teal-600 dark:text-teal-400 font-bold">Browse Lawyers</span>
+            </div>
+
+            <h1 className="text-4xl md:text-5xl font-extrabold text-slate-900 dark:text-white mb-5 tracking-tight leading-tight">
+              Explore Top <br/>
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-teal-600 to-emerald-500">Legal Experts</span>
             </h1>
-            <p className="text-slate-600 dark:text-slate-400 text-lg leading-relaxed">
-              Explore our curated list of verified legal professionals. Filter by expertise, experience, and availability to find your perfect match.
+            <p className="text-slate-600 dark:text-slate-400 text-base md:text-lg leading-relaxed max-w-md">
+              Find the right lawyer for your needs. Filter by specialization, experience, and book your consultation instantly.
             </p>
-          </motion.div>
+          </div>
+
+          {/* Right Custom Vector Illustration (Built with CSS & React Icons) */}
+          <div className="hidden md:flex w-full max-w-[420px] h-[200px] relative rounded-[2.5rem] overflow-hidden shadow-xl shadow-teal-900/10 dark:shadow-black/50 border-[6px] border-white dark:border-slate-800 z-10 items-center justify-center bg-gradient-to-br from-teal-500 via-teal-600 to-emerald-700">
+            
+            {/* Abstract light flares for 3D depth */}
+            <div className="absolute top-[-50px] left-[-30px] w-[150px] h-[150px] bg-white/20 rounded-full blur-2xl pointer-events-none"></div>
+            <div className="absolute bottom-[-50px] right-[-30px] w-[180px] h-[180px] bg-black/20 rounded-full blur-2xl pointer-events-none"></div>
+            
+            {/* Minimal Scale Icon representing Legal System */}
+            <motion.div 
+              initial={{ y: 10, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ duration: 0.8, ease: "easeOut" }}
+              className="relative z-10 text-white/90 drop-shadow-2xl"
+            >
+              <FaBalanceScale className="text-8xl" />
+            </motion.div>
+
+            {/* Note: If you want to use the EXACT image from your screenshot later, 
+                just remove everything inside this <div> and uncomment the img tag below: */}
+            {/* <img src="/images/your-hero-image.png" alt="Legal Experts" className="w-full h-full object-cover" /> */}
+          </div>
         </div>
       </section>
 
-      {/* --- MAIN CONTENT SECTION --- */}
-      <section className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-10 flex flex-col lg:flex-row gap-8">
+      <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 flex flex-col gap-6">
         
-        {/* Mobile Filter Toggle Button */}
-        <div className="lg:hidden flex items-center justify-between w-full">
-          <button 
-            onClick={() => setIsMobileFilterOpen(!isMobileFilterOpen)}
-            className="flex items-center gap-2 px-5 py-2.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-800 dark:text-slate-200 text-sm font-semibold shadow-sm active:scale-95 transition-transform"
-          >
-            <FaSlidersH /> {isMobileFilterOpen ? "Hide Filters" : "Show Filters"}
-          </button>
+        {/* --- GLOBAL SEARCH & SORT BAR --- */}
+        <div className="w-full bg-white dark:bg-slate-900 rounded-2xl shadow-[0_2px_15px_-3px_rgba(0,0,0,0.05)] border border-slate-100 dark:border-slate-800/80 p-2 flex flex-col sm:flex-row items-center justify-between">
+          
+          <div className="flex-1 flex items-center px-4 w-full">
+            <FaSearch className="text-slate-400 shrink-0" size={16} />
+            <input 
+              type="text" 
+              placeholder="Search lawyers by name, specialization or keyword..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full pl-3 pr-4 py-2.5 bg-transparent text-sm text-slate-800 dark:text-slate-200 focus:outline-none placeholder:text-slate-400"
+            />
+          </div>
+
+          <div className="flex items-center gap-4 border-t sm:border-t-0 sm:border-l border-slate-100 dark:border-slate-800 pt-3 sm:pt-0 sm:pl-4 w-full sm:w-auto px-2">
+            <div className="flex items-center gap-2 w-full sm:w-auto">
+              <span className="text-sm text-slate-500 dark:text-slate-400 whitespace-nowrap">Sort By:</span>
+              <div className="relative w-full sm:w-[160px]">
+                <select 
+                  value={sortBy}
+                  onChange={(e) => setSortBy(e.target.value)}
+                  className="w-full bg-slate-50 dark:bg-slate-800 text-sm font-semibold text-slate-700 dark:text-slate-200 rounded-lg px-3 py-2 focus:outline-none cursor-pointer appearance-none border border-slate-200 dark:border-slate-700"
+                >
+                  <option value="Newest">Newest</option>
+                  <option value="Rating">Highest Rating</option>
+                  <option value="PriceLow">Price: Low to High</option>
+                </select>
+                <FaChevronDown size={10} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
+              </div>
+            </div>
+            
+            <button className="p-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors">
+              <FiSliders size={18} />
+            </button>
+          </div>
         </div>
 
-        {/* --- SIDEBAR FILTERS (Sticky) --- */}
-        <aside className={`w-full lg:w-[300px] shrink-0 flex-col gap-6 ${isMobileFilterOpen ? 'flex' : 'hidden lg:flex'}`}>
-          <div className="bg-white dark:bg-slate-900/50 backdrop-blur-xl rounded-2xl p-6 border border-slate-200/80 dark:border-slate-800/80 shadow-sm sticky top-24">
+        {/* --- MAIN CONTENT (Sidebar + Grid) --- */}
+        <div className="flex flex-col lg:flex-row gap-8 items-start">
+          
+          {/* --- SIDEBAR FILTERS --- */}
+          <aside className="w-full lg:w-[280px] shrink-0 bg-white dark:bg-slate-900 rounded-2xl shadow-[0_4px_20px_-4px_rgba(0,0,0,0.03)] border border-slate-100 dark:border-slate-800/80 p-6 sticky top-6">
             
-            <div className="flex items-center justify-between mb-8 pb-4 border-b border-slate-100 dark:border-slate-800/60">
+            <div className="flex items-center justify-between mb-8">
               <h2 className="text-lg font-bold text-slate-900 dark:text-white">Filters</h2>
-              <button 
-                onClick={resetFilters}
-                className="text-sm font-semibold text-teal-600 dark:text-teal-400 hover:text-teal-700 transition-colors"
-              >
+              <button onClick={resetFilters} className="text-xs font-semibold text-teal-600 dark:text-teal-400 hover:underline">
                 Reset All
               </button>
             </div>
 
-            {/* Custom Specialization Dropdown */}
+            {/* Specialization Filter */}
             <div className="mb-8" ref={specRef}>
-              <label className="block text-sm font-bold text-slate-800 dark:text-slate-200 mb-3">
-                Specialization
-              </label>
+              <div className="flex items-center gap-2 mb-3">
+                <BiBadgeCheck className="text-slate-400 text-lg" />
+                <label className="text-sm font-semibold text-slate-800 dark:text-slate-200">Specialization</label>
+              </div>
               <div className="relative">
                 <button
                   type="button"
                   onClick={() => setIsSpecOpen(!isSpecOpen)}
-                  className="w-full flex items-center justify-between bg-slate-50 dark:bg-[#030712] border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 rounded-xl px-4 py-3 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-teal-500/30 transition-all"
+                  className="w-full flex items-center justify-between bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-teal-500 shadow-sm transition-all"
                 >
-                  {specialization === "All" ? "All Specializations" : specialization}
-                  <motion.div animate={{ rotate: isSpecOpen ? 180 : 0 }}>
-                    <FaChevronDown size={12} className="text-slate-400" />
-                  </motion.div>
+                  <span className="truncate">{specialization}</span>
+                  <FaChevronDown size={10} className="text-slate-400 shrink-0" />
                 </button>
-
                 <AnimatePresence>
                   {isSpecOpen && (
                     <motion.ul
-                      initial={{ opacity: 0, y: -10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -10 }}
-                      transition={{ duration: 0.2 }}
-                      className="absolute z-50 w-full mt-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-xl overflow-hidden"
+                      initial={{ opacity: 0, y: -5 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -5 }}
+                      className="absolute z-50 w-full mt-1 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg shadow-lg overflow-hidden py-1"
                     >
                       {specializationsList.map((spec) => (
                         <li
                           key={spec}
-                          onClick={() => {
-                            setSpecialization(spec);
-                            setIsSpecOpen(false);
-                          }}
-                          className={`px-4 py-3 text-sm cursor-pointer transition-colors flex items-center justify-between ${
-                            specialization === spec 
-                            ? "bg-teal-50 dark:bg-teal-900/20 text-teal-700 dark:text-teal-400 font-semibold" 
-                            : "text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800/50"
-                          }`}
+                          onClick={() => { setSpecialization(spec); setIsSpecOpen(false); }}
+                          className="px-3 py-2 text-sm cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 flex justify-between items-center transition-colors"
                         >
-                          {spec === "All" ? "All Specializations" : spec}
-                          {specialization === spec && <FaCheck size={12} />}
+                          {spec}
+                          {specialization === spec && <FaCheck size={10} className="text-teal-600" />}
                         </li>
                       ))}
                     </motion.ul>
@@ -229,196 +233,140 @@ export default function LawyersClientWrapper({ initialLawyers }) {
               </div>
             </div>
 
-            {/* Availability */}
+            {/* Availability Filter (FIXED: Added onChange to inputs) */}
             <div className="mb-8">
-              <label className="block text-sm font-bold text-slate-800 dark:text-slate-200 mb-4">
-                Availability
-              </label>
-              <div className="space-y-4">
+              <div className="flex items-center gap-2 mb-3">
+                <FaRegClock className="text-slate-400" />
+                <label className="text-sm font-semibold text-slate-800 dark:text-slate-200">Availability</label>
+              </div>
+              <div className="space-y-3">
                 {[
                   { label: "Available", status: "Available", color: "bg-emerald-500" },
                   { label: "Busy", status: "Busy", color: "bg-rose-500" }
                 ].map((item) => (
                   <label key={item.status} className="flex items-center gap-3 cursor-pointer group">
-                    <div className={`w-5 h-5 rounded border flex items-center justify-center transition-all ${
-                      availability.includes(item.status) 
-                      ? "bg-teal-600 border-teal-600" 
-                      : "border-slate-300 dark:border-slate-600 group-hover:border-teal-500"
+                    <input 
+                      type="checkbox" 
+                      className="hidden" 
+                      checked={availability.includes(item.status)}
+                      onChange={() => toggleAvailability(item.status)}
+                    />
+                    <div className={`w-4 h-4 rounded border flex items-center justify-center transition-all ${
+                      availability.includes(item.status) ? "bg-teal-600 border-teal-600" : "border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 group-hover:border-teal-500"
                     }`}>
-                      {availability.includes(item.status) && <FaCheck size={10} className="text-white" />}
+                      {availability.includes(item.status) && <FaCheck size={8} className="text-white" />}
                     </div>
-                    <span className="text-sm font-medium text-slate-600 dark:text-slate-400 group-hover:text-slate-900 dark:group-hover:text-slate-200 flex items-center gap-2">
-                      {item.label} <span className={`w-2 h-2 rounded-full ${item.color}`}></span>
+                    <span className="text-sm text-slate-600 dark:text-slate-400 group-hover:text-slate-900 dark:group-hover:text-slate-200 flex items-center gap-2 transition-colors">
+                      {item.label} <span className={`w-2 h-2 rounded-full ${item.color} inline-block`}></span>
                     </span>
                   </label>
                 ))}
               </div>
             </div>
 
-            {/* Consultation Fee Slider */}
+            {/* Consultation Fee Filter */}
             <div className="mb-8">
-              <label className="block text-sm font-bold text-slate-800 dark:text-slate-200 mb-4">
-                Max Consultation Fee
-              </label>
-              <div className="flex items-center justify-between text-sm font-semibold text-teal-600 dark:text-teal-400 mb-3 bg-teal-50 dark:bg-teal-900/20 px-3 py-1.5 rounded-lg w-fit">
-                ${maxFee}{maxFee === 500 ? "+" : ""}
+              <div className="flex items-center gap-2 mb-4">
+                <FaMoneyBillWave className="text-slate-400" />
+                <label className="text-sm font-semibold text-slate-800 dark:text-slate-200">Consultation Fee</label>
               </div>
-              <input 
-                type="range" 
-                min="10" 
-                max="500" 
-                step="10"
-                value={maxFee}
-                onChange={(e) => setMaxFee(Number(e.target.value))}
-                className="w-full h-2 bg-slate-200 dark:bg-slate-800 rounded-lg appearance-none cursor-pointer accent-teal-600 hover:accent-teal-500 transition-all"
-              />
-              <div className="flex justify-between text-xs text-slate-400 mt-2 font-medium">
-                <span>$10</span>
-                <span>$500+</span>
-              </div>
-            </div>
-
-            {/* Experience */}
-            <div className="mb-2">
-              <label className="block text-sm font-bold text-slate-800 dark:text-slate-200 mb-4">
-                Experience
-              </label>
-              <div className="space-y-4">
-                {["0-2 Years", "3-5 Years", "5+ Years"].map((range) => {
-                  const val = range.split(" ")[0];
-                  return (
-                    <label key={range} className="flex items-center gap-3 cursor-pointer group">
-                      <div className={`w-5 h-5 rounded border flex items-center justify-center transition-all ${
-                        experience.includes(val) 
-                        ? "bg-teal-600 border-teal-600" 
-                        : "border-slate-300 dark:border-slate-600 group-hover:border-teal-500"
-                      }`}>
-                        {experience.includes(val) && <FaCheck size={10} className="text-white" />}
-                      </div>
-                      <span className="text-sm font-medium text-slate-600 dark:text-slate-400 group-hover:text-slate-900 dark:group-hover:text-slate-200">
-                        {range}
-                      </span>
-                    </label>
-                  );
-                })}
+              <div className="px-1">
+                <input 
+                  type="range" min="10" max="500" step="10" value={maxFee}
+                  onChange={(e) => setMaxFee(Number(e.target.value))}
+                  className="w-full h-1.5 bg-slate-200 dark:bg-slate-700 rounded-lg appearance-none cursor-pointer accent-teal-600"
+                />
+                <div className="flex justify-between text-xs text-slate-500 dark:text-slate-400 mt-3 font-medium">
+                  <span>$10</span>
+                  <span>$500+</span>
+                </div>
+                <div className="mt-3 bg-slate-50 dark:bg-slate-800 py-2 rounded-lg text-center text-xs font-bold text-slate-700 dark:text-slate-300 border border-slate-100 dark:border-slate-700">
+                  Up to ${maxFee}{maxFee === 500 ? "+" : ""}
+                </div>
               </div>
             </div>
 
-          </div>
-        </aside>
-
-        {/* --- MAIN GRID AREA --- */}
-        <div className="flex-1 flex flex-col gap-8">
-          
-          {/* Top Bar (Search & Sort) */}
-          <motion.div 
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="flex flex-col sm:flex-row gap-4 items-center justify-between bg-white dark:bg-slate-900 p-2 pl-4 rounded-2xl border border-slate-200/80 dark:border-slate-800/80 shadow-sm"
-          >
-            {/* Search Input */}
-            <div className="relative w-full sm:max-w-md flex items-center">
-              <FaSearch className="absolute left-3 text-slate-400" size={16} />
-              <input 
-                type="text" 
-                placeholder="Search by name, specialization..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-3 bg-transparent text-sm font-medium text-slate-900 dark:text-slate-100 focus:outline-none placeholder:text-slate-400"
-              />
-            </div>
-
-            {/* Sort Dropdown */}
-            <div className="flex items-center gap-3 w-full sm:w-auto border-t sm:border-t-0 border-slate-100 dark:border-slate-800 pt-3 sm:pt-0 sm:pl-4 sm:border-l pr-2">
-              <span className="text-sm font-medium text-slate-500 whitespace-nowrap">Sort:</span>
-              <div className="relative">
-                <select 
-                  value={sortBy}
-                  onChange={(e) => setSortBy(e.target.value)}
-                  className="bg-slate-50 dark:bg-slate-800 text-sm font-bold text-slate-800 dark:text-slate-200 rounded-lg px-4 py-2.5 focus:outline-none cursor-pointer appearance-none pr-8 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
-                >
-                  <option value="Newest">Newest</option>
-                  <option value="Price (Low to High)">Price: Low to High</option>
-                  <option value="Price (High to Low)">Price: High to Low</option>
-                </select>
-                <FaChevronDown size={10} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 pointer-events-none" />
+            {/* Experience Filter */}
+            <div className="mb-6">
+              <div className="flex items-center gap-2 mb-3">
+                <FaBriefcase className="text-slate-400" />
+                <label className="text-sm font-semibold text-slate-800 dark:text-slate-200">Experience</label>
               </div>
-            </div>
-          </motion.div>
-
-          {/* Cards Dynamic Grid */}
-          {filteredLawyers.length > 0 ? (
-            <motion.div 
-              variants={containerVariants}
-              initial="hidden"
-              animate="visible"
-              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-6"
-            >
-              {filteredLawyers.map((lawyer, index) => (
-                <motion.div key={lawyer._id} variants={itemVariants} layout>
-                  <LawyerCard lawyer={lawyer} index={index} />
-                </motion.div>
-              ))}
-            </motion.div>
-          ) : (
-            <motion.div 
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              className="flex flex-col items-center justify-center py-24 bg-white/50 dark:bg-slate-900/50 rounded-3xl border-2 border-dashed border-slate-300 dark:border-slate-700"
-            >
-              <div className="w-16 h-16 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center mb-4">
-                <FaSearch className="text-slate-400 text-2xl" />
-              </div>
-              <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2">No Experts Found</h3>
-              <p className="text-slate-500 dark:text-slate-400 mb-6 text-center max-w-md">
-                We couldn't find any lawyers matching your exact criteria. Try tweaking your filters or search terms.
-              </p>
-              <button 
-                onClick={resetFilters}
-                className="px-6 py-3 bg-teal-600 text-white font-semibold rounded-xl hover:bg-teal-700 active:scale-95 transition-all shadow-lg shadow-teal-600/20"
-              >
-                Reset All Filters
-              </button>
-            </motion.div>
-          )}
-
-          {/* Pagination Structure */}
-          {filteredLawyers.length > 0 && (
-            <motion.div 
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.5 }}
-              className="flex justify-center items-center gap-2 mt-10 pt-10 border-t border-slate-200/80 dark:border-slate-800"
-            >
-              <button className="px-4 py-2 text-sm font-semibold text-slate-400 dark:text-slate-500 hover:text-slate-900 dark:hover:text-white disabled:opacity-50 transition-colors" disabled>
-                &lt; Prev
-              </button>
-              <div className="flex items-center gap-1.5">
-                {[1, 2, 3].map((page) => (
-                  <button 
-                    key={page}
-                    className={`w-10 h-10 rounded-xl text-sm font-bold transition-all ${
-                      page === 1 
-                      ? 'bg-teal-600 text-white shadow-md shadow-teal-600/20' 
-                      : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
-                    }`}
-                  >
-                    {page}
-                  </button>
+              <div className="space-y-3">
+                {["0 - 2 Years", "3 - 5 Years", "5+ Years"].map((range) => (
+                  <label key={range} className="flex items-center gap-3 cursor-pointer group">
+                    <input 
+                      type="checkbox" 
+                      className="hidden" 
+                      checked={experience.includes(range)}
+                      onChange={() => toggleExperience(range)}
+                    />
+                    <div className={`w-4 h-4 rounded border flex items-center justify-center transition-all ${
+                      experience.includes(range) ? "bg-teal-600 border-teal-600" : "border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 group-hover:border-teal-500"
+                    }`}>
+                      {experience.includes(range) && <FaCheck size={8} className="text-white" />}
+                    </div>
+                    <span className="text-sm text-slate-600 dark:text-slate-400 group-hover:text-slate-900 dark:group-hover:text-slate-200 transition-colors">
+                      {range}
+                    </span>
+                  </label>
                 ))}
-                <span className="text-slate-400 px-1 font-bold">...</span>
-                <button className="w-10 h-10 rounded-xl text-sm font-bold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all">
-                  20
+              </div>
+            </div>
+
+            {/* Reset Button */}
+            <button 
+              onClick={resetFilters}
+              className="w-full py-2.5 mt-2 flex items-center justify-center gap-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 rounded-lg text-sm font-semibold hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors shadow-sm"
+            >
+              <FiRefreshCcw /> Reset Filters
+            </button>
+
+          </aside>
+
+          {/* --- RIGHT SIDE GRID --- */}
+          <div className="flex-1 w-full">
+            {filteredLawyers.length > 0 ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                {filteredLawyers.map((lawyer, index) => (
+                  <LawyerCard key={lawyer._id} lawyer={lawyer} index={index} />
+                ))}
+              </div>
+            ) : (
+              <div className="flex flex-col items-center justify-center py-24 bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-sm text-center">
+                <div className="w-16 h-16 bg-slate-50 dark:bg-slate-800 rounded-full flex items-center justify-center mb-4">
+                  <FaSearch className="text-slate-300 dark:text-slate-500 text-2xl" />
+                </div>
+                <h3 className="text-lg font-bold text-slate-800 dark:text-white">No Lawyers Found</h3>
+                <p className="text-sm text-slate-500 dark:text-slate-400 mt-2 max-w-sm">
+                  We couldn't find any lawyers matching your exact filters. Try adjusting them to see more results.
+                </p>
+                <button onClick={resetFilters} className="mt-6 px-6 py-2 bg-teal-600 text-white text-sm font-semibold rounded-lg hover:bg-teal-700 transition-colors">
+                  Clear Filters
                 </button>
               </div>
-              <button className="px-4 py-2 text-sm font-semibold text-slate-800 dark:text-slate-200 hover:text-teal-600 dark:hover:text-teal-400 transition-colors">
-                Next &gt;
-              </button>
-            </motion.div>
-          )}
+            )}
+            
+            {/* Pagination Placeholder */}
+            {filteredLawyers.length > 0 && (
+              <div className="flex justify-center items-center gap-2 mt-12 mb-5">
+                <button className="px-3 py-1.5 text-sm font-medium text-slate-400 dark:text-slate-500 flex items-center gap-1 disabled:opacity-50" disabled>
+                  <FaChevronRight className="rotate-180" size={10} /> Previous
+                </button>
+                <div className="flex gap-1.5">
+                  <button className="w-8 h-8 rounded-full bg-teal-600 text-white text-sm font-bold shadow-md shadow-teal-600/20">1</button>
+                  <button className="w-8 h-8 rounded-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 text-sm hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors">2</button>
+                  <button className="w-8 h-8 rounded-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 text-sm hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors">3</button>
+                </div>
+                <button className="px-3 py-1.5 text-sm font-medium text-slate-700 dark:text-slate-300 flex items-center gap-1 hover:text-teal-600 dark:hover:text-teal-400 transition-colors">
+                  Next <FaChevronRight size={10} />
+                </button>
+              </div>
+            )}
+          </div>
 
         </div>
-      </section>
-    </motion.div>
+      </div>
+    </div>
   );
 }

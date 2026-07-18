@@ -23,6 +23,10 @@ export const auth = betterAuth({
     additionalFields: {
       userType: {
         type: "string",
+        defaultValue: "client",
+      },
+      completeProfile: {
+        defaultValue: false,
       },
     },
   },
