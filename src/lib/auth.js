@@ -21,12 +21,14 @@ export const auth = betterAuth({
   },
   user: {
     additionalFields: {
+      completeProfile: {
+        type: "boolean",
+        defaultValue: false,
+        required: false,
+      },
       userType: {
         type: "string",
-        defaultValue: "client",
-      },
-      completeProfile: {
-        defaultValue: false,
+        required: false,
       },
     },
   },

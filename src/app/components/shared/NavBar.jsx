@@ -45,6 +45,7 @@ export default function Navbar() {
   const dropdownRef = useRef(null);
   const { data: session } = authClient.useSession();
   const user = session?.user || null;
+  console.log(user);
 
   const handleLogout = async () => {
     await authClient.signOut();

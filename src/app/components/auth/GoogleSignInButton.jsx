@@ -13,6 +13,7 @@ import {
 import { FaCheckCircle } from "react-icons/fa";
 import { authClient } from "@/lib/auth-client";
 import { useRouter } from "next/navigation";
+import { updateUserType } from "@/lib/actions/user";
 
 export default function GoogleSignInButton({ text = "Continue with Google" }) {
   const router = useRouter();
@@ -108,12 +109,16 @@ export default function GoogleSignInButton({ text = "Continue with Google" }) {
     setIsUpdatingRole(true);
 
     try {
-      console.log(`Updated role to: ${selectedRole}`);
+      const { data: session } = await authClient.getSession();
+      const userId = session?.user.id;
+
+      const result = await updateUserType(userId, selectedRole);
 
       showCustomToast("Account setup complete!", "success");
 
       setShowRoleModal(false);
-      router.push("/");
+      await authClient.getSession({ forceRefresh: true });
+      window.location.href = "/";
     } catch (error) {
       showCustomToast("Failed to update role. Try again.", "error");
     } finally {
