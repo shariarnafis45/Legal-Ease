@@ -1,7 +1,7 @@
 import { serverFetch } from "../core/server";
 
-export const getCompleteLawyers = () => {
-  return serverFetch(`/api/lawyers`);
+export const getCompleteLawyers = (query) => {
+  return serverFetch(`/api/lawyers?${query}`);
 };
 
 export const getLawyerDetailsById = (lawyerId) => {

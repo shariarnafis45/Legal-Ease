@@ -26,6 +26,15 @@ import toast from "react-hot-toast";
 export default function Navbar() {
   const pathname = usePathname();
 
+  const [open, setOpen] = useState(false);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const dropdownRef = useRef(null);
+
+  const { data: session } = authClient.useSession();
+  const user = session?.user || null;
+
+  // --- Dynamic Navigation Links Logic ---
   const navLinks = [
     { name: "Home", href: "/", active: pathname === "/" },
     {
@@ -35,17 +44,41 @@ export default function Navbar() {
     },
   ];
 
+  if (user?.userType === "client") {
+    navLinks.push({
+      name: "Become a Lawyer",
+      href: "/become-lawyer",
+      active: pathname.startsWith("/become-lawyer"),
+    });
+  }
+
+  if (user?.userType === "lawyer" && user?.completeProfile === false) {
+    navLinks.push({
+      name: "Complete Lawyer Profile",
+      href: "/complete-profile",
+      active: pathname.startsWith("/complete-profile"),
+    });
+  }
+
   const privateLinks = [
     { name: "My Profile", href: "/dashboard/profile", icon: User },
   ];
 
-  const [open, setOpen] = useState(false);
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
-  const dropdownRef = useRef(null);
-  const { data: session } = authClient.useSession();
-  const user = session?.user || null;
-  console.log(user);
+  const dashboardLinks = {
+    client: "/dashboard/client",
+    lawyer: "/dashboard/lawyer",
+    admin: "/dashboard/admin",
+  };
+
+  if (user?.email) {
+    if (!privateLinks.some((link) => link.name === "Dashboard")) {
+      privateLinks.push({
+        name: "Dashboard",
+        href: dashboardLinks[user?.userType || "client"],
+        icon: LayoutDashboard,
+      });
+    }
+  }
 
   const handleLogout = async () => {
     await authClient.signOut();
@@ -87,22 +120,6 @@ export default function Navbar() {
     );
   };
 
-  const dashboardLinks = {
-    client: "/dashboard/client",
-    lawyer: "/dashboard/lawyer",
-    admin: "/dashboard/admin",
-  };
-
-  if (user?.email) {
-    if (!privateLinks.some((link) => link.name === "Dashboard")) {
-      privateLinks.push({
-        name: "Dashboard",
-        href: dashboardLinks[user?.userType || "client"],
-        icon: LayoutDashboard,
-      });
-    }
-  }
-
   useEffect(() => {
     function handleClickOutside(event) {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -122,7 +139,7 @@ export default function Navbar() {
             href="/"
             className="flex flex-shrink-0 items-center gap-3 focus-visible:outline-none"
           >
-            <div className="relative h-10 w-10  transition-transform duration-200 hover:scale-105">
+            <div className="relative h-10 w-10 transition-transform duration-200 hover:scale-105">
               <Image
                 src={Logo}
                 alt="LegalEase Symbol Logo"
@@ -140,7 +157,7 @@ export default function Navbar() {
             </div>
           </Link>
 
-          {/* Core Desktop Navigation Links */}
+          {/* Core Desktop Navigation Links (Show on lg+) */}
           <nav className="hidden lg:flex items-center gap-8 pl-4">
             {navLinks.map((link) => (
               <Link
@@ -164,7 +181,7 @@ export default function Navbar() {
           </nav>
 
           {/* Desktop Search Engine Bar */}
-          <div className="hidden md:flex max-w-sm flex-1 items-center px-2">
+          <div className="hidden lg:flex max-w-sm flex-1 items-center px-2">
             <div className="relative w-full">
               <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5">
                 <Search
@@ -189,8 +206,8 @@ export default function Navbar() {
             </div>
           </div>
 
-          {/* Functional Actions Layout / Right Section */}
-          <div className="hidden md:flex items-center gap-4">
+          {/* Functional Actions Layout / Right Section (Show on lg+) */}
+          <div className="hidden lg:flex items-center gap-4">
             <ThemeSwitch />
             <div className="h-5 w-px bg-slate-200 dark:bg-white/10" />
 
@@ -343,8 +360,8 @@ export default function Navbar() {
             )}
           </div>
 
-          {/* Compact View Navigation Drawer Launcher (Mobile) */}
-          <div className="flex items-center gap-2 md:hidden">
+          {/* Compact View Navigation Drawer Launcher (Tablet & Mobile: lg:hidden) */}
+          <div className="flex items-center gap-2 lg:hidden">
             <ThemeSwitch />
             <button
               onClick={() => setOpen(!open)}
@@ -361,7 +378,6 @@ export default function Navbar() {
         </div>
       </div>
 
-      {/* Mobile View Drawer */}
       <AnimatePresence>
         {open && (
           <motion.div
@@ -369,7 +385,7 @@ export default function Navbar() {
             initial="hidden"
             animate="visible"
             exit="hidden"
-            className="md:hidden overflow-hidden border-t border-slate-200/60 bg-white/95 dark:border-white/5 dark:bg-slate-950/95"
+            className="lg:hidden overflow-hidden border-t border-slate-200/60 bg-white/95 dark:border-white/5 dark:bg-slate-950/95"
           >
             <div className="px-4 py-4 space-y-4">
               <div className="relative w-full">
@@ -379,6 +395,8 @@ export default function Navbar() {
                 />
                 <input
                   type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="Search lawyers..."
                   className="w-full rounded-xl border border-slate-200 bg-slate-50 py-2 pl-9 pr-4 font-poppins text-xs dark:border-white/10 dark:bg-slate-900"
                 />

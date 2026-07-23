@@ -9,13 +9,16 @@ export const metadata = {
     "Explore verified legal experts and find the right lawyer for your needs.",
 };
 
-export default async function LawyersPage() {
-  const lawyersData = await getCompleteLawyers();
-  console.log(lawyersData);
+export default async function LawyersPage({ searchParams }) {
+  const filter = await searchParams;
+  const querySearch = new URLSearchParams(filter);
+  const queryStr = querySearch.toString();
+
+  const lawyersData = await getCompleteLawyers(queryStr);
 
   return (
     <main className="min-h-screen bg-slate-50 dark:bg-[#030712] transition-colors duration-300">
-      <LawyersClientWrapper initialLawyers={lawyersData} />
+      <LawyersClientWrapper filter={filter} initialLawyers={lawyersData} />
     </main>
   );
 }

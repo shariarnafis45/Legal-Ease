@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useMemo, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import {
   FaChevronRight,
@@ -16,17 +16,58 @@ import { BiBadgeCheck } from "react-icons/bi";
 import { FiSliders, FiRefreshCcw } from "react-icons/fi";
 import { motion, AnimatePresence } from "framer-motion";
 import LawyerCard from "@/app/components/shared/LawyersCard";
+import { useRouter } from "next/navigation";
 
-export default function LawyersClientWrapper({ initialLawyers }) {
-  const [searchQuery, setSearchQuery] = useState("");
-  const [sortBy, setSortBy] = useState("Newest");
-  const [specialization, setSpecialization] = useState("Select Specialization");
-  const [availability, setAvailability] = useState([]);
-  const [experience, setExperience] = useState([]);
-  const [maxFee, setMaxFee] = useState(500);
+export default function LawyersClientWrapper({ initialLawyers, filter }) {
+  const [searchQuery, setSearchQuery] = useState(filter?.search || "");
+  const [sortBy, setSortBy] = useState(filter?.sortBy || "Newest");
+  const [specialization, setSpecialization] = useState(
+    filter?.specialization || "Select Specialization",
+  );
+  const [availability, setAvailability] = useState(
+    filter?.availability ? filter.availability.split(",") : [],
+  );
+  const [experience, setExperience] = useState(
+    filter?.experience ? filter.experience.split(",") : [],
+  );
+  const [maxFee, setMaxFee] = useState(
+    filter?.maxFee ? Number(filter.maxFee) : 500,
+  );
+  const router = useRouter();
 
   const [isSpecOpen, setIsSpecOpen] = useState(false);
   const specRef = useRef(null);
+  useEffect(() => {
+    const sp = new URLSearchParams();
+    if (searchQuery) {
+      sp.set("search", searchQuery);
+    }
+    if (specialization && specialization !== "Select Specialization") {
+      sp.set("specialization", specialization);
+    }
+    if (availability.length > 0) {
+      sp.set("availability", availability.join(","));
+    }
+    if (experience.length > 0) {
+      sp.set("experience", experience.join(","));
+    }
+    if (maxFee && maxFee !== 500) {
+      sp.set("maxFee", maxFee.toString());
+    }
+    if (sortBy && sortBy !== "Newest") {
+      sp.set("sortBy", sortBy);
+    }
+    const path = `?${sp.toString()}`;
+    router.push(path);
+  }, [
+    searchQuery,
+    router,
+    specialization,
+    availability,
+    experience,
+    maxFee,
+    sortBy,
+  ]);
 
   useEffect(() => {
     function handleClickOutside(event) {
@@ -47,57 +88,57 @@ export default function LawyersClientWrapper({ initialLawyers }) {
   ];
 
   // Filter Logic
-  const filteredLawyers = useMemo(() => {
-    let result = [...(initialLawyers || [])];
+  // const filteredLawyers = useMemo(() => {
+  //   let result = [...(initialLawyers || [])];
 
-    if (searchQuery) {
-      result = result.filter(
-        (lawyer) =>
-          lawyer.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          lawyer?.specialization?.name
-            ?.toLowerCase()
-            .includes(searchQuery.toLowerCase()),
-      );
-    }
+  //   if (searchQuery) {
+  //     result = result.filter(
+  //       (lawyer) =>
+  //         lawyer.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+  //         lawyer?.specialization?.name
+  //           ?.toLowerCase()
+  //           .includes(searchQuery.toLowerCase()),
+  //     );
+  //   }
 
-    if (specialization !== "Select Specialization") {
-      result = result.filter(
-        (lawyer) => lawyer?.specialization?.name === specialization,
-      );
-    }
+  //   if (specialization !== "Select Specialization") {
+  //     result = result.filter(
+  //       (lawyer) => lawyer?.specialization?.name === specialization,
+  //     );
+  //   }
 
-    // Fixed Availability Filter
-    if (availability.length > 0) {
-      result = result.filter(
-        (lawyer) =>
-          availability.includes(lawyer.status) ||
-          availability.includes(lawyer.availability),
-      );
-    }
+  //   // Fixed Availability Filter
+  //   if (availability.length > 0) {
+  //     result = result.filter(
+  //       (lawyer) =>
+  //         availability.includes(lawyer.status) ||
+  //         availability.includes(lawyer.availability),
+  //     );
+  //   }
 
-    if (experience.length > 0) {
-      result = result.filter((lawyer) => {
-        const exp = lawyer.experience || 0;
-        if (experience.includes("0 - 2 Years") && exp <= 2) return true;
-        if (experience.includes("3 - 5 Years") && exp >= 3 && exp <= 5)
-          return true;
-        if (experience.includes("5+ Years") && exp > 5) return true;
-        return false;
-      });
-    }
+  //   if (experience.length > 0) {
+  //     result = result.filter((lawyer) => {
+  //       const exp = lawyer.experience || 0;
+  //       if (experience.includes("0 - 2 Years") && exp <= 2) return true;
+  //       if (experience.includes("3 - 5 Years") && exp >= 3 && exp <= 5)
+  //         return true;
+  //       if (experience.includes("5+ Years") && exp > 5) return true;
+  //       return false;
+  //     });
+  //   }
 
-    result = result.filter((lawyer) => (lawyer?.fee?.amount || 0) <= maxFee);
+  //   result = result.filter((lawyer) => (lawyer?.fee?.amount || 0) <= maxFee);
 
-    return result;
-  }, [
-    initialLawyers,
-    searchQuery,
-    specialization,
-    availability,
-    experience,
-    maxFee,
-    sortBy,
-  ]);
+  //   return result;
+  // }, [
+  //   initialLawyers,
+  //   searchQuery,
+  //   specialization,
+  //   availability,
+  //   experience,
+  //   maxFee,
+  //   sortBy,
+  // ]);
 
   const resetFilters = () => {
     setSpecialization("Select Specialization");
@@ -411,9 +452,9 @@ export default function LawyersClientWrapper({ initialLawyers }) {
 
           {/* --- RIGHT SIDE GRID --- */}
           <div className="flex-1 w-full">
-            {filteredLawyers.length > 0 ? (
+            {initialLawyers.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-                {filteredLawyers.map((lawyer, index) => (
+                {initialLawyers.map((lawyer, index) => (
                   <LawyerCard key={lawyer._id} lawyer={lawyer} index={index} />
                 ))}
               </div>
@@ -439,7 +480,7 @@ export default function LawyersClientWrapper({ initialLawyers }) {
             )}
 
             {/* Pagination Placeholder */}
-            {filteredLawyers.length > 0 && (
+            {initialLawyers.length > 0 && (
               <div className="flex justify-center items-center gap-2 mt-12 mb-5">
                 <button
                   className="px-3 py-1.5 text-sm font-medium text-slate-400 dark:text-slate-500 flex items-center gap-1 disabled:opacity-50"

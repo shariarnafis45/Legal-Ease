@@ -1,6 +1,10 @@
 import { serverMuting } from "../core/server";
 
 export const updateUserType = async (userId, userType) => {
-  console.log(userType);
-  return serverMuting(`/api/users/${userId}`, {userType}, "PATCH");
+  return serverMuting(`/api/users/${userId}`, { userType }, "PATCH");
+};
+
+export const updateLawyerProfile = async (userId, data) => {
+  console.log(userId, data);
+  return serverMuting(`/api/lawyers/${userId}`, data, "PATCH");
 };
