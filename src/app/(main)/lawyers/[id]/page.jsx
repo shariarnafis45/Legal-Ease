@@ -7,7 +7,7 @@ import { getUserSession } from "@/lib/core/session";
 const LawyersDetailsPage = async ({ params }) => {
   const { id } = await params;
   const lawyerDetails = await getLawyerDetailsById(id);
-  const session = await getUserSession();
+  const user = await getUserSession();
 
   if (!lawyerDetails) {
     return (
@@ -17,9 +17,7 @@ const LawyersDetailsPage = async ({ params }) => {
     );
   }
 
-  return (
-    <LawyerDetailsClient lawyer={lawyerDetails} user={session?.user || null} />
-  );
+  return <LawyerDetailsClient lawyer={lawyerDetails} user={user || null} />;
 };
 
 export default LawyersDetailsPage;

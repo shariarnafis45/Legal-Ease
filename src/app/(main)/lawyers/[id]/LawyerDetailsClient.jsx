@@ -26,6 +26,7 @@ export default function LawyerDetailsClient({ lawyer, user }) {
   const [activeTab, setActiveTab] = useState("about");
   const [isHireModalOpen, setIsHireModalOpen] = useState(false);
   const [reviewText, setReviewText] = useState("");
+  
 
   const joinedDate = new Date(lawyer.createdAt).toLocaleDateString("en-US", {
     month: "short",
@@ -34,10 +35,10 @@ export default function LawyerDetailsClient({ lawyer, user }) {
   });
 
   const handleHireClick = () => {
-    // if (!user) {
-    //   alert("Please login to hire a lawyer!");
-    //   return;
-    // }
+    if (!user) {
+      alert("Please login to hire a lawyer!");
+      return;
+    }
     setIsHireModalOpen(true);
   };
 
@@ -512,9 +513,18 @@ export default function LawyerDetailsClient({ lawyer, user }) {
                   >
                     Cancel
                   </button>
-                  <button className="flex-1 px-4 py-3 bg-teal-700 text-white rounded-xl font-medium hover:bg-teal-800 transition shadow-sm">
-                    Send Request
-                  </button>
+                  <form action="/api/payment" method="POST">
+                    <input type="hidden" value={lawyer.name} name="name" />
+                    <input type="hidden" value={lawyer._id} name="lawyerId" />
+                    <input
+                      type="hidden"
+                      value={lawyer.fee.amount}
+                      name="amount"
+                    />
+                    <button className="flex-1 px-4 py-3 bg-teal-700 text-white rounded-xl font-medium hover:bg-teal-800 transition shadow-sm">
+                      Send Request
+                    </button>
+                  </form>
                 </div>
               </div>
             </motion.div>
