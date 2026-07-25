@@ -12,7 +12,6 @@ import {
   Briefcase,
   Heart,
   MessageSquare,
-  Share2,
   Shield,
   Award,
   BookOpen,
@@ -20,13 +19,25 @@ import {
   X,
   Lock,
 } from "lucide-react";
-import { redirect } from "next/navigation";
+import { sendHiringRequest } from "@/lib/actions/hire";
+import { showErrorToast, showSuccessToast } from "@/app/components/shared/customToast";
+import { useRouter } from "next/navigation";
 
-export default function LawyerDetailsClient({ lawyer, user }) {
+ 
+
+export default function LawyerDetailsClient({
+  lawyer,
+  user,
+  hasAlreadyRequested = false,
+  isAccepted,
+}) {
   const [activeTab, setActiveTab] = useState("about");
   const [isHireModalOpen, setIsHireModalOpen] = useState(false);
   const [reviewText, setReviewText] = useState("");
-  
+
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isRequested, setIsRequested] = useState(hasAlreadyRequested);
+  const router = useRouter()
 
   const joinedDate = new Date(lawyer.createdAt).toLocaleDateString("en-US", {
     month: "short",
@@ -34,12 +45,51 @@ export default function LawyerDetailsClient({ lawyer, user }) {
     year: "numeric",
   });
 
-  const handleHireClick = () => {
+  const handleOpenHireModal = () => {
     if (!user) {
-      alert("Please login to hire a lawyer!");
+      showErrorToast("Please login to hire a lawyer!");
+      router.push('/auth/signin')
       return;
     }
+
+    if (user?.userType === "lawyer" || user?.role === "lawyer") {
+      showErrorToast("Lawyers cannot hire other lawyers!");
+      return;
+    }
+
     setIsHireModalOpen(true);
+  };
+
+  const handleConfirmHireRequest = async () => {
+    setIsSubmitting(true);
+    try {
+      const requestData = {
+        lawyerId: lawyer._id,
+        lawyerName: lawyer.name,
+        lawyerEmail: lawyer.email,
+        clientId: user.id,
+        clientName: user.name,
+        clientEmail: user.email,
+        fee: lawyer.fee.amount,
+        specialization: lawyer.specialization.name,
+      };
+
+      const requestSent = await sendHiringRequest(requestData);
+
+      if (requestSent && requestSent.success !== false) {
+        setIsRequested(true);
+        setIsHireModalOpen(false);
+        showSuccessToast("Hiring request sent successfully!");
+      } else {
+        showErrorToast(
+          requestSent.message || "Failed to send request. Please try again."
+        );
+      }
+    } catch (error) {
+      showErrorToast("Something went wrong!");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -128,10 +178,30 @@ export default function LawyerDetailsClient({ lawyer, user }) {
 
             <div className="flex gap-4">
               <button
-                onClick={handleHireClick}
-                className="bg-teal-700 hover:bg-teal-800 text-white px-6 py-3 rounded-xl font-medium flex items-center gap-2 transition shadow-sm"
+                onClick={handleOpenHireModal}
+                disabled={
+                  isAccepted ||
+                  isRequested ||
+                  lawyer.status !== "Available" ||
+                  user?.userType === "lawyer"
+                }
+                className={`${
+                  isAccepted || isRequested
+                    ? "bg-gray-400 cursor-not-allowed"
+                    : lawyer.status !== "Available" ||
+                        user?.userType === "lawyer"
+                      ? "bg-gray-300 dark:bg-gray-800 cursor-not-allowed"
+                      : "bg-teal-700 hover:bg-teal-800"
+                } text-white px-6 py-3 rounded-xl font-medium flex items-center gap-2 transition shadow-sm`}
               >
-                <Calendar className="w-5 h-5" /> Hire Lawyer
+                <Calendar className="w-5 h-5" />
+                {isAccepted
+                  ? "Hired"
+                  : isRequested
+                    ? "Requested"
+                    : lawyer.status !== "Available"
+                      ? "Unavailable"
+                      : "Hire Lawyer"}
               </button>
               <button className="border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 px-6 py-3 rounded-xl font-medium flex items-center gap-2 hover:bg-gray-50 dark:hover:bg-gray-800 transition">
                 <MessageSquare className="w-5 h-5" /> Message
@@ -233,7 +303,7 @@ export default function LawyerDetailsClient({ lawyer, user }) {
                   </div>
                 )}
 
-                {/* REVIEWS & COMMENT TAB */}
+                {/* REVIEWS TAB */}
                 {activeTab === "reviews" && (
                   <div className="bg-white dark:bg-gray-900 p-8 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-800">
                     <div className="flex justify-between items-center mb-8">
@@ -250,7 +320,6 @@ export default function LawyerDetailsClient({ lawyer, user }) {
                         </span>
                       )}
                     </div>
-
                     {/* Review Form (Only visible if logged in) */}
                     {user && (
                       <div className="mb-8 p-4 bg-gray-50 dark:bg-gray-800/50 rounded-xl border border-gray-200 dark:border-gray-700">
@@ -358,7 +427,6 @@ export default function LawyerDetailsClient({ lawyer, user }) {
 
           {/* RIGHT SIDEBAR (Sticky) */}
           <div className="space-y-6 lg:sticky lg:top-8 self-start">
-            {/* Action Box */}
             <div className="bg-white dark:bg-gray-900 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-800">
               <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">
                 Hire Request
@@ -386,12 +454,30 @@ export default function LawyerDetailsClient({ lawyer, user }) {
               </div>
 
               <button
-                onClick={handleHireClick}
-                disabled={lawyer.status !== "Available"}
-                className="w-full bg-teal-700 disabled:bg-gray-300 dark:disabled:bg-gray-800 text-white py-3.5 rounded-xl font-bold hover:bg-teal-800 transition mb-4 flex justify-center items-center gap-2"
+                onClick={handleOpenHireModal}
+                disabled={
+                  isAccepted ||
+                  isRequested ||
+                  lawyer.status !== "Available" ||
+                  user?.userType === "lawyer"
+                }
+                className={`w-full py-3.5 rounded-xl font-bold transition flex justify-center items-center gap-2 mb-4 ${
+                  isAccepted || isRequested
+                    ? "bg-gray-400 cursor-not-allowed text-white"
+                    : lawyer.status !== "Available" ||
+                        user?.userType === "lawyer"
+                      ? "bg-gray-300 dark:bg-gray-800 text-gray-500 cursor-not-allowed"
+                      : "bg-teal-700 hover:bg-teal-800 text-white"
+                }`}
               >
-                {lawyer.status !== "Available" ? (
+                {isAccepted ? (
+                  "Hired"
+                ) : isRequested ? (
+                  "Requested"
+                ) : lawyer.status !== "Available" ? (
                   "Unavailable"
+                ) : user?.userType === "lawyer" ? (
+                  "Cannot Hire"
                 ) : (
                   <>
                     <Calendar className="w-4 h-4" /> Hire Lawyer
@@ -458,7 +544,7 @@ export default function LawyerDetailsClient({ lawyer, user }) {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              onClick={() => setIsHireModalOpen(false)}
+              onClick={() => !isSubmitting && setIsHireModalOpen(false)}
               className="absolute inset-0 bg-black/60 backdrop-blur-sm"
             />
 
@@ -479,7 +565,7 @@ export default function LawyerDetailsClient({ lawyer, user }) {
                     </p>
                   </div>
                   <button
-                    onClick={() => setIsHireModalOpen(false)}
+                    onClick={() => !isSubmitting && setIsHireModalOpen(false)}
                     className="p-2 text-gray-400 hover:text-gray-900 dark:hover:text-white transition bg-gray-50 dark:bg-gray-800 rounded-full"
                   >
                     <X className="w-4 h-4" />
@@ -509,22 +595,18 @@ export default function LawyerDetailsClient({ lawyer, user }) {
                 <div className="flex gap-3">
                   <button
                     onClick={() => setIsHireModalOpen(false)}
-                    className="flex-1 px-4 py-3 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 rounded-xl font-medium hover:bg-gray-50 dark:hover:bg-gray-800 transition"
+                    disabled={isSubmitting}
+                    className="flex-1 px-4 py-3 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 rounded-xl font-medium hover:bg-gray-50 dark:hover:bg-gray-800 transition disabled:opacity-50"
                   >
                     Cancel
                   </button>
-                  <form action="/api/payment" method="POST">
-                    <input type="hidden" value={lawyer.name} name="name" />
-                    <input type="hidden" value={lawyer._id} name="lawyerId" />
-                    <input
-                      type="hidden"
-                      value={lawyer.fee.amount}
-                      name="amount"
-                    />
-                    <button className="flex-1 px-4 py-3 bg-teal-700 text-white rounded-xl font-medium hover:bg-teal-800 transition shadow-sm">
-                      Send Request
-                    </button>
-                  </form>
+                  <button
+                    onClick={handleConfirmHireRequest}
+                    disabled={isSubmitting}
+                    className="flex-1 px-4 py-3 bg-teal-700 text-white rounded-xl font-medium hover:bg-teal-800 transition shadow-sm disabled:opacity-50 flex items-center justify-center"
+                  >
+                    {isSubmitting ? "Sending..." : "Send Request"}
+                  </button>
                 </div>
               </div>
             </motion.div>
