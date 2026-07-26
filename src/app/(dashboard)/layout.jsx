@@ -14,11 +14,11 @@ export const metadata = {
 
 export default function DashboardLayout({ children }) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body>
         <SidebarProvider>
-          <ThemeProvider>
-            <div className="flex h-screen w-full bg-[#F9FAFB] dark:bg-background overflow-hidden font-sans">
+          <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+            <div className="flex h-screen w-full bg-[#F8FAFC] dark:bg-[#050B14] overflow-hidden font-sans transition-colors duration-300">
               <Toaster position="top-center" />
 
               {/* Sidebar Component */}
