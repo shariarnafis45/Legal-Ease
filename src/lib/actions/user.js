@@ -5,6 +5,8 @@ export const updateUserType = async (userId, userType) => {
 };
 
 export const updateLawyerProfile = async (userId, data) => {
-  console.log(userId, data);
   return serverMuting(`/api/lawyers/${userId}`, data, "PATCH");
+};
+export const updateProfile = async (userId, data) => {
+  return serverMuting(`/api/update-users/${userId}`, data, "PATCH");
 };

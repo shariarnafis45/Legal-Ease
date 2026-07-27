@@ -61,7 +61,7 @@ export default function Navbar() {
   }
 
   const privateLinks = [
-    { name: "My Profile", href: "/dashboard/profile", icon: User },
+    // { name: "My Profile", href: "/dashboard/profile", icon: User },
   ];
 
   const dashboardLinks = {
