@@ -1,7 +1,7 @@
-"use client";
-
 import React from "react";
 import Link from "next/link";
+import { getClientHiringRequestHistory } from "@/lib/api/hire";
+import { getUserSession } from "@/lib/core/session";
 import {
   Briefcase,
   Clock,
@@ -11,9 +11,43 @@ import {
   Scale,
   CheckCircle2,
   AlertCircle,
+  MessageSquare,
+  XCircle,
 } from "lucide-react";
 
-const ClientDashboard = () => {
+const formatDate = (dateInput) => {
+  if (!dateInput) return "N/A";
+  const dateString =
+    typeof dateInput === "object" && dateInput.$date
+      ? dateInput.$date
+      : dateInput;
+  return new Intl.DateTimeFormat("en-US", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+  }).format(new Date(dateString));
+};
+
+export default async function ClientDashboardPage() {
+  const user = await getUserSession();
+
+  const hiringRequestHistory =
+    (await getClientHiringRequestHistory(user?.id)) || [];
+
+  const activeHiringsCount = hiringRequestHistory.filter(
+    (req) => req.status === "accepted" || req.status === "active",
+  ).length;
+
+  const pendingCount = hiringRequestHistory.filter(
+    (req) => req.status === "pending",
+  ).length;
+
+  const totalSpent = hiringRequestHistory
+    .filter((req) => req.paymentStatus === "paid")
+    .reduce((sum, req) => sum + (req.fee || 0), 0);
+
+  const totalRequests = hiringRequestHistory.length;
+
   const today = new Date().toLocaleDateString("en-US", {
     weekday: "long",
     year: "numeric",
@@ -21,11 +55,11 @@ const ClientDashboard = () => {
     day: "numeric",
   });
 
-  // Mock Data for Stats
   const stats = [
     {
       title: "Active Hirings",
-      value: "03",
+      value:
+        activeHiringsCount < 10 ? `0${activeHiringsCount}` : activeHiringsCount,
       icon: Briefcase,
       color: "text-blue-600 dark:text-blue-400",
       bg: "bg-blue-50 dark:bg-blue-500/10",
@@ -33,7 +67,7 @@ const ClientDashboard = () => {
     },
     {
       title: "Pending Requests",
-      value: "01",
+      value: pendingCount < 10 ? `0${pendingCount}` : pendingCount,
       icon: Clock,
       color: "text-amber-600 dark:text-amber-400",
       bg: "bg-amber-50 dark:bg-amber-500/10",
@@ -41,15 +75,15 @@ const ClientDashboard = () => {
     },
     {
       title: "Total Spent",
-      value: "$450",
+      value: `$${totalSpent}`,
       icon: CreditCard,
       color: "text-teal-600 dark:text-teal-400",
       bg: "bg-teal-50 dark:bg-teal-500/10",
       border: "border-teal-100 dark:border-teal-500/20",
     },
     {
-      title: "Documents",
-      value: "12",
+      title: "Total Requests",
+      value: totalRequests < 10 ? `0${totalRequests}` : totalRequests,
       icon: FileText,
       color: "text-purple-600 dark:text-purple-400",
       bg: "bg-purple-50 dark:bg-purple-500/10",
@@ -57,36 +91,8 @@ const ClientDashboard = () => {
     },
   ];
 
-  // Mock Data for Recent Activity
-  const recentHirings = [
-    {
-      id: 1,
-      lawyer: "Zainab Yusuf",
-      type: "Cyber Law",
-      date: "Jul 26, 2026",
-      status: "Pending",
-      amount: "$140",
-    },
-    {
-      id: 2,
-      lawyer: "Lisa Jenkins",
-      type: "Employment Law",
-      date: "Jul 20, 2026",
-      status: "Active",
-      amount: "$100",
-    },
-    {
-      id: 3,
-      lawyer: "Robert Fox",
-      type: "Corporate Law",
-      date: "Jul 15, 2026",
-      status: "Completed",
-      amount: "$350",
-    },
-  ];
-
   return (
-    <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-700">
+    <div className="space-y-6 max-w-7xl mx-auto p-4 sm:p-6 lg:p-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
       {/* 🌟 1. Welcome Header Section */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white dark:bg-[#0B1324] p-6 sm:p-8 rounded-3xl border border-slate-100 dark:border-slate-800/60 shadow-sm relative overflow-hidden">
         {/* Background Decorative Element */}
@@ -96,11 +102,11 @@ const ClientDashboard = () => {
           <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight mb-1">
             Welcome back,{" "}
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-teal-600 to-teal-400">
-              Shariar!
+              {user?.name?.split(" ")[0] || "Client"}!
             </span>{" "}
             👋
           </h1>
-          <p className="text-sm font-medium text-slate-500 dark:text-slate-400">
+          <p className="text-sm font-medium text-slate-500 dark:text-slate-400 mt-1">
             {today} • Here is what's happening with your legal cases today.
           </p>
         </div>
@@ -149,7 +155,7 @@ const ClientDashboard = () => {
 
       {/* 🌟 3. Bottom Layout: Recent Hirings & Quick Connect */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Left Side: Recent Hirings Table (Takes 2 columns on Large screens) */}
+        {/* Left Side: Recent Hirings Table */}
         <div className="lg:col-span-2 bg-white dark:bg-[#0B1324] rounded-3xl border border-slate-100 dark:border-slate-800/60 shadow-sm overflow-hidden flex flex-col">
           <div className="p-6 border-b border-slate-100 dark:border-slate-800/60 flex items-center justify-between">
             <h2 className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
@@ -165,58 +171,77 @@ const ClientDashboard = () => {
           </div>
 
           <div className="p-0 overflow-x-auto">
-            <table className="w-full text-left whitespace-nowrap">
-              <thead className="bg-slate-50 dark:bg-slate-800/30 text-xs uppercase text-slate-500 dark:text-slate-400 font-semibold">
-                <tr>
-                  <th className="px-6 py-4">Lawyer</th>
-                  <th className="px-6 py-4">Date</th>
-                  <th className="px-6 py-4">Status</th>
-                  <th className="px-6 py-4">Fee</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-100 dark:divide-slate-800/60 text-sm">
-                {recentHirings.map((hiring) => (
-                  <tr
-                    key={hiring.id}
-                    className="hover:bg-slate-50/50 dark:hover:bg-slate-800/20 transition-colors group"
-                  >
-                    <td className="px-6 py-4">
-                      <p className="font-bold text-slate-800 dark:text-slate-200">
-                        {hiring.lawyer}
-                      </p>
-                      <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                        {hiring.type}
-                      </p>
-                    </td>
-                    <td className="px-6 py-4 text-slate-600 dark:text-slate-300 font-medium">
-                      {hiring.date}
-                    </td>
-                    <td className="px-6 py-4">
-                      <span
-                        className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-bold ${
-                          hiring.status === "Pending"
-                            ? "bg-amber-50 text-amber-600 dark:bg-amber-500/10 dark:text-amber-400 border border-amber-100 dark:border-amber-500/20"
-                            : hiring.status === "Active"
-                              ? "bg-blue-50 text-blue-600 dark:bg-blue-500/10 dark:text-blue-400 border border-blue-100 dark:border-blue-500/20"
-                              : "bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400 border border-emerald-100 dark:border-emerald-500/20"
-                        }`}
-                      >
-                        {hiring.status === "Pending" && (
-                          <AlertCircle size={12} />
-                        )}
-                        {hiring.status === "Completed" && (
-                          <CheckCircle2 size={12} />
-                        )}
-                        {hiring.status}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 font-bold text-slate-800 dark:text-slate-200">
-                      {hiring.amount}
-                    </td>
+            {hiringRequestHistory.length === 0 ? (
+              <div className="p-12 text-center">
+                <Briefcase
+                  size={40}
+                  className="mx-auto text-slate-300 dark:text-slate-600 mb-3"
+                />
+                <h3 className="text-base font-bold text-slate-700 dark:text-slate-300">
+                  No Hirings Yet
+                </h3>
+                <p className="text-sm text-slate-500 mt-1">
+                  You haven't hired any lawyer recently.
+                </p>
+              </div>
+            ) : (
+              <table className="w-full text-left whitespace-nowrap">
+                <thead className="bg-slate-50 dark:bg-slate-800/30 text-[11px] uppercase text-slate-500 dark:text-slate-400 font-bold tracking-wider border-b border-slate-100 dark:border-slate-800/60">
+                  <tr>
+                    <th className="px-6 py-4">Lawyer Info</th>
+                    <th className="px-6 py-4">Date</th>
+                    <th className="px-6 py-4">Status</th>
+                    <th className="px-6 py-4">Fee</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody className="divide-y divide-slate-100 dark:divide-slate-800/60 text-sm">
+                  {hiringRequestHistory.slice(0, 4).map((hiring) => (
+                    <tr
+                      key={hiring._id?.$oid || hiring._id}
+                      className="hover:bg-slate-50/50 dark:hover:bg-slate-800/20 transition-colors group"
+                    >
+                      <td className="px-6 py-4">
+                        <p className="font-bold text-slate-800 dark:text-slate-200">
+                          {hiring.lawyerName}
+                        </p>
+                        <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                          {hiring.specialization}
+                        </p>
+                      </td>
+                      <td className="px-6 py-4 text-slate-600 dark:text-slate-300 font-medium text-xs">
+                        {formatDate(hiring.createdAt)}
+                      </td>
+                      <td className="px-6 py-4">
+                        <span
+                          className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-bold capitalize ${
+                            hiring.status === "pending"
+                              ? "bg-amber-50 text-amber-600 dark:bg-amber-500/10 dark:text-amber-400 border border-amber-100 dark:border-amber-500/20"
+                              : hiring.status === "accepted"
+                                ? "bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400 border border-emerald-100 dark:border-emerald-500/20"
+                                : "bg-rose-50 text-rose-600 dark:bg-rose-500/10 dark:text-rose-400 border border-rose-100 dark:border-rose-500/20"
+                          }`}
+                        >
+                          {hiring.status === "pending" && (
+                            <AlertCircle size={12} />
+                          )}
+                          {hiring.status === "accepted" && (
+                            <CheckCircle2 size={12} />
+                          )}
+                          {(hiring.status === "rejected" ||
+                            hiring.status === "completed") && (
+                            <XCircle size={12} />
+                          )}
+                          {hiring.status}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 font-bold text-slate-800 dark:text-slate-200">
+                        ${hiring.fee}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
           </div>
         </div>
 
@@ -247,8 +272,4 @@ const ClientDashboard = () => {
       </div>
     </div>
   );
-};
-
-import { MessageSquare } from "lucide-react";
-
-export default ClientDashboard;
+}
