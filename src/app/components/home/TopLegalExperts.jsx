@@ -2,48 +2,38 @@ import React from "react";
 import Link from "next/link";
 import { FaArrowRight } from "react-icons/fa6";
 import TopExpertCard from "../shared/TopExpertCard";
+import { getCompleteLawyers } from "@/lib/api/lawyers";
 
+export default async function TopLegalExperts() {
+  const rawLawyersData = await getCompleteLawyers();
+  const lawyersList = Array.isArray(rawLawyersData)
+    ? rawLawyersData
+    : rawLawyersData?.data && Array.isArray(rawLawyersData.data)
+      ? rawLawyersData.data
+      : [];
 
-export default function TopLegalExperts() {
-  const topExpertsData = [
-    {
-      _id: "684b9d8c123456783",
-      name: "Michael Brown",
-      image:
-        "https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=400",
-      specialization: { name: "Criminal Law", slug: "criminal-law" },
-      experience: 10,
-      rating: 4.9,
-      totalReviews: 150,
-      totalHires: 520, // Most Hired
-    },
-    {
-      _id: "684b9d8c123456786",
-      name: "Lisa Martinez",
-      image:
-        "https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=400",
-      specialization: { name: "Employment Law", slug: "employment-law" },
-      experience: 9,
-      rating: 4.8,
-      totalReviews: 130,
-      totalHires: 410, // Second
-    },
-    {
-      _id: "684b9d8c123456781",
-      name: "John Anderson",
-      image:
-        "https://images.unsplash.com/photo-1560250097-0b93528c311a?q=80&w=400",
-      specialization: { name: "Corporate Law", slug: "corporate-law" },
-      experience: 8,
-      rating: 4.9,
-      totalReviews: 120,
-      totalHires: 380,
-    },
-  ];
+  const topExpertsData = lawyersList
+    .filter((lawyer) => lawyer.completeProfile !== false)
+    .sort((a, b) => {
+      if ((b.totalHires || 0) !== (a.totalHires || 0)) {
+        return (b.totalHires || 0) - (a.totalHires || 0);
+      }
+
+      return (b.rating || 0) - (a.rating || 0);
+    })
+    .slice(0, 3)
+    .map((lawyer) => ({
+      ...lawyer,
+
+      _id:
+        typeof lawyer._id === "object" && lawyer._id?.$oid
+          ? lawyer._id.$oid
+          : String(lawyer._id),
+    }));
 
   return (
     <section className="w-full py-20 px-4 sm:px-6 lg:px-8 max-w-[1440px] mx-auto bg-white dark:bg-[#030712] transition-colors duration-300">
-      {/* Upper Panel Header Section matching image_3a993e.png */}
+      {/* Header Section */}
       <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-12 pb-2">
         <div className="flex flex-col text-left">
           <h2 className="font-syne text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white tracking-tight">
@@ -63,17 +53,23 @@ export default function TopLegalExperts() {
         </Link>
       </div>
 
-      {/* Perfect 3-Column Grid Arrangement */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        {topExpertsData.map((lawyer, index) => (
-          <TopExpertCard
-            key={lawyer._id}
-            lawyer={lawyer}
-            index={index}
-            rank={index + 1}
-          />
-        ))}
-      </div>
+      {/* 3-Column Grid */}
+      {topExpertsData.length > 0 ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {topExpertsData.map((lawyer, index) => (
+            <TopExpertCard
+              key={lawyer._id}
+              lawyer={lawyer}
+              index={index}
+              rank={index + 1}
+            />
+          ))}
+        </div>
+      ) : (
+        <div className="text-center py-12 text-slate-400 font-poppins text-sm">
+          No experts found at the moment.
+        </div>
+      )}
     </section>
   );
 }
