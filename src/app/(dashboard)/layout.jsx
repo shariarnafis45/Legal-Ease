@@ -17,7 +17,7 @@ export default function DashboardLayout({ children }) {
     <html lang="en" suppressHydrationWarning>
       <body>
         <SidebarProvider>
-          <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+          <ThemeProvider attribute="class" defaultTheme="light">
             <div className="flex h-screen w-full bg-[#F8FAFC] dark:bg-[#050B14] overflow-hidden font-sans transition-colors duration-300">
               <Toaster position="top-center" />
 

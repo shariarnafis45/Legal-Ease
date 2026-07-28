@@ -25,16 +25,16 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en" class="light" data-theme="light">
+    <html lang="en" suppressHydrationWarning>
       <body
         className={`${syne.variable} ${poppins.variable} bg-background text-foreground`}
       >
-        <ThemeProvider>
+        <ThemeProvider attribute="class" defaultTheme="light">
           <Navbar />
           <main>{children}</main>
-          <Footer/>
+          <Footer />
         </ThemeProvider>
-        <Toaster/>
+        <Toaster />
       </body>
     </html>
   );
