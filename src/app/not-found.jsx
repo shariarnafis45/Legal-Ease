@@ -91,7 +91,7 @@ export default function NotFound() {
 
       {/* Footer Branding */}
       <div className="absolute bottom-6 text-xs text-gray-400 dark:text-gray-500 font-medium">
-        © {new Date().getFullYear()} LawyerHub. All rights reserved.
+        © {new Date().getFullYear()} LegalEase. All rights reserved.
       </div>
     </div>
   );
