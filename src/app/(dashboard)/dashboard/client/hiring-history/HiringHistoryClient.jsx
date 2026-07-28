@@ -220,14 +220,14 @@ export default function HiringHistoryClient({ initialData }) {
 
             <div className="pt-2 border-t border-gray-100 dark:border-gray-800 flex justify-end items-center">
               {item.status === "accepted" && item.paymentStatus === "unpaid" ? (
-                <Link
-                  href={`/dashboard/user/checkout/${item._id}`}
-                  className="w-full"
-                >
+                <form action="/api/payment" method="POST">
+                  <input value={item.lawyerName} name="name" type="hidden" />
+                  <input value={item.fee} name="amount" type="hidden" />
+                  <input value={item.lawyerId} name="lawyerId" type="hidden" />
                   <button className="w-full flex justify-center items-center gap-2 bg-teal-600 hover:bg-teal-700 text-white px-4 py-2.5 rounded-xl text-sm font-bold transition shadow-sm">
                     <CreditCard className="w-4 h-4" /> Pay Now
                   </button>
-                </Link>
+                </form>
               ) : item.paymentStatus === "paid" ? (
                 <span className="w-full flex justify-center items-center gap-1.5 py-2 text-sm font-bold text-teal-600 dark:text-teal-400 bg-teal-50 dark:bg-teal-900/20 rounded-xl">
                   <CheckCircle className="w-4 h-4" /> Payment Completed
