@@ -106,7 +106,6 @@ export default function SignInPage() {
       const { data, error } = await authClient.signIn.email({
         email: formData.email,
         password: formData.password,
-        
       });
 
       if (data) {
@@ -130,8 +129,6 @@ export default function SignInPage() {
 
   return (
     <div className="min-h-screen w-full relative flex items-center justify-center overflow-hidden transition-colors duration-500 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-slate-100 via-slate-50 to-slate-200 dark:from-[#0e172a] dark:via-[#050B14] dark:to-[#020617]">
-      <Toaster position="top-center" />
-
       {/* Background Glow Effects */}
       <div className="absolute top-[-10%] left-[-10%] w-[40vw] h-[40vw] bg-teal-400/20 dark:bg-teal-600/10 rounded-full blur-[120px] pointer-events-none mix-blend-multiply dark:mix-blend-lighten"></div>
       <div className="absolute bottom-[-10%] right-[-10%] w-[35vw] h-[35vw] bg-blue-400/20 dark:bg-blue-600/10 rounded-full blur-[100px] pointer-events-none mix-blend-multiply dark:mix-blend-lighten"></div>
@@ -203,7 +200,11 @@ export default function SignInPage() {
                   onClick={() => setShowPassword(!showPassword)}
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-1"
                 >
-                  {showPassword ? <FaEyeSlash size={16} /> : <FaEye size={16} />}
+                  {showPassword ? (
+                    <FaEyeSlash size={16} />
+                  ) : (
+                    <FaEye size={16} />
+                  )}
                 </button>
               </div>
             </div>
@@ -251,7 +252,7 @@ export default function SignInPage() {
                 <div className="flex-1 h-px bg-slate-200 dark:bg-slate-800"></div>
               </div>
 
-             <GoogleSignInButton/>
+              <GoogleSignInButton />
             </div>
 
             <p className="text-center text-sm font-medium text-slate-500 dark:text-slate-400 pt-2">
