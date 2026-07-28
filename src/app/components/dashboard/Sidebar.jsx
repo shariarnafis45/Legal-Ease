@@ -43,7 +43,7 @@ export default function Sidebar() {
     try {
       await authClient.signOut();
       toast.success("Logged out successfully");
-      router.push("/login");
+      router.push("/");
     } catch (error) {
       toast.error("Failed to logout");
     }

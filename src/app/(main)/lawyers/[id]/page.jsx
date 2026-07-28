@@ -9,16 +9,19 @@ const LawyersDetailsPage = async ({ params }) => {
   const lawyerDetails = await getLawyerDetailsById(id);
   const user = await getUserSession();
 
-  const checkRequest = await requestAlreadyExist(user.id, id);
- 
+  const checkRequest = await requestAlreadyExist(user?.id, id);
+
   const hasAlreadyRequested =
     checkRequest?.status === "pending" || checkRequest?.status === "accepted";
+
   return (
     <LawyerDetailsClient
       lawyer={lawyerDetails}
       user={user || null}
       hasAlreadyRequested={hasAlreadyRequested}
-      isAccepted = {checkRequest?.status === "accepted"}
+      isAccepted={checkRequest?.status === "accepted"}
+      isRejected={checkRequest?.status === "rejected"}
+      isPaid={checkRequest?.paymentStatus === "paid"}
     />
   );
 };

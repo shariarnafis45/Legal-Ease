@@ -20,16 +20,19 @@ import {
   Lock,
 } from "lucide-react";
 import { sendHiringRequest } from "@/lib/actions/hire";
-import { showErrorToast, showSuccessToast } from "@/app/components/shared/customToast";
+import {
+  showErrorToast,
+  showSuccessToast,
+} from "@/app/components/shared/customToast";
 import { useRouter } from "next/navigation";
-
- 
 
 export default function LawyerDetailsClient({
   lawyer,
   user,
   hasAlreadyRequested = false,
   isAccepted,
+  isRejected,
+  isPaid,
 }) {
   const [activeTab, setActiveTab] = useState("about");
   const [isHireModalOpen, setIsHireModalOpen] = useState(false);
@@ -37,7 +40,7 @@ export default function LawyerDetailsClient({
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isRequested, setIsRequested] = useState(hasAlreadyRequested);
-  const router = useRouter()
+  const router = useRouter();
 
   const joinedDate = new Date(lawyer.createdAt).toLocaleDateString("en-US", {
     month: "short",
@@ -45,10 +48,63 @@ export default function LawyerDetailsClient({
     year: "numeric",
   });
 
+
+  const getButtonDetails = () => {
+    if (isAccepted && isPaid) {
+      return {
+        label: "Hired",
+        disabled: true,
+        style: "bg-green-600 text-white cursor-not-allowed",
+      };
+    }
+    if (isAccepted && !isPaid) {
+      return {
+        label: "Accepted (Unpaid)",
+        disabled: true,
+        style: "bg-amber-600 text-white cursor-not-allowed",
+      };
+    }
+    if (isRejected) {
+      return {
+        label: "Rejected",
+        disabled: true,
+        style: "bg-red-500 text-white cursor-not-allowed",
+      };
+    }
+    if (isRequested) {
+      return {
+        label: "Requested",
+        disabled: true,
+        style: "bg-gray-400 text-white cursor-not-allowed",
+      };
+    }
+    if (lawyer.status !== "Available") {
+      return {
+        label: "Unavailable",
+        disabled: true,
+        style: "bg-gray-300 dark:bg-gray-800 text-gray-500 cursor-not-allowed",
+      };
+    }
+    if (user?.userType === "lawyer" || user?.role === "lawyer") {
+      return {
+        label: "Cannot Hire",
+        disabled: true,
+        style: "bg-gray-300 dark:bg-gray-800 text-gray-500 cursor-not-allowed",
+      };
+    }
+    return {
+      label: "Hire Lawyer",
+      disabled: false,
+      style: "bg-teal-700 hover:bg-teal-800 text-white",
+    };
+  };
+
+  const buttonDetails = getButtonDetails();
+
   const handleOpenHireModal = () => {
     if (!user) {
       showErrorToast("Please login to hire a lawyer!");
-      router.push('/auth/signin')
+      router.push("/auth/signin");
       return;
     }
 
@@ -82,7 +138,7 @@ export default function LawyerDetailsClient({
         showSuccessToast("Hiring request sent successfully!");
       } else {
         showErrorToast(
-          requestSent.message || "Failed to send request. Please try again."
+          requestSent.message || "Failed to send request. Please try again.",
         );
       }
     } catch (error) {
@@ -179,29 +235,11 @@ export default function LawyerDetailsClient({
             <div className="flex gap-4">
               <button
                 onClick={handleOpenHireModal}
-                disabled={
-                  isAccepted ||
-                  isRequested ||
-                  lawyer.status !== "Available" ||
-                  user?.userType === "lawyer"
-                }
-                className={`${
-                  isAccepted || isRequested
-                    ? "bg-gray-400 cursor-not-allowed"
-                    : lawyer.status !== "Available" ||
-                        user?.userType === "lawyer"
-                      ? "bg-gray-300 dark:bg-gray-800 cursor-not-allowed"
-                      : "bg-teal-700 hover:bg-teal-800"
-                } text-white px-6 py-3 rounded-xl font-medium flex items-center gap-2 transition shadow-sm`}
+                disabled={buttonDetails.disabled}
+                className={`${buttonDetails.style} px-6 py-3 rounded-xl font-medium flex items-center gap-2 transition shadow-sm`}
               >
                 <Calendar className="w-5 h-5" />
-                {isAccepted
-                  ? "Hired"
-                  : isRequested
-                    ? "Requested"
-                    : lawyer.status !== "Available"
-                      ? "Unavailable"
-                      : "Hire Lawyer"}
+                {buttonDetails.label}
               </button>
               <button className="border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 px-6 py-3 rounded-xl font-medium flex items-center gap-2 hover:bg-gray-50 dark:hover:bg-gray-800 transition">
                 <MessageSquare className="w-5 h-5" /> Message
@@ -285,7 +323,6 @@ export default function LawyerDetailsClient({
                       Professional Experience
                     </h2>
                     <div className="relative border-l-2 border-teal-100 dark:border-teal-900/50 ml-3 space-y-8">
-                      {/* Demo Experience Item */}
                       <div className="relative pl-6">
                         <div className="absolute w-4 h-4 bg-teal-600 rounded-full -left-[9px] top-1 border-4 border-white dark:border-gray-900"></div>
                         <h3 className="font-bold text-gray-900 dark:text-white">
@@ -320,7 +357,6 @@ export default function LawyerDetailsClient({
                         </span>
                       )}
                     </div>
-                    {/* Review Form (Only visible if logged in) */}
                     {user && (
                       <div className="mb-8 p-4 bg-gray-50 dark:bg-gray-800/50 rounded-xl border border-gray-200 dark:border-gray-700">
                         <textarea
@@ -345,7 +381,6 @@ export default function LawyerDetailsClient({
                       </div>
                     )}
 
-                    {/* Demo Review List */}
                     <div className="space-y-6">
                       <div className="border-b border-gray-100 dark:border-gray-800 pb-6">
                         <div className="flex justify-between items-start mb-2">
@@ -455,34 +490,11 @@ export default function LawyerDetailsClient({
 
               <button
                 onClick={handleOpenHireModal}
-                disabled={
-                  isAccepted ||
-                  isRequested ||
-                  lawyer.status !== "Available" ||
-                  user?.userType === "lawyer"
-                }
-                className={`w-full py-3.5 rounded-xl font-bold transition flex justify-center items-center gap-2 mb-4 ${
-                  isAccepted || isRequested
-                    ? "bg-gray-400 cursor-not-allowed text-white"
-                    : lawyer.status !== "Available" ||
-                        user?.userType === "lawyer"
-                      ? "bg-gray-300 dark:bg-gray-800 text-gray-500 cursor-not-allowed"
-                      : "bg-teal-700 hover:bg-teal-800 text-white"
-                }`}
+                disabled={buttonDetails.disabled}
+                className={`w-full py-3.5 rounded-xl font-bold transition flex justify-center items-center gap-2 mb-4 ${buttonDetails.style}`}
               >
-                {isAccepted ? (
-                  "Hired"
-                ) : isRequested ? (
-                  "Requested"
-                ) : lawyer.status !== "Available" ? (
-                  "Unavailable"
-                ) : user?.userType === "lawyer" ? (
-                  "Cannot Hire"
-                ) : (
-                  <>
-                    <Calendar className="w-4 h-4" /> Hire Lawyer
-                  </>
-                )}
+                {!buttonDetails.disabled && <Calendar className="w-4 h-4" />}
+                {buttonDetails.label}
               </button>
 
               <div className="space-y-3 text-sm text-gray-600 dark:text-gray-400">

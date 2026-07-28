@@ -62,7 +62,7 @@ export default function Slide({ slide }) {
             </Link>
             
             <Link 
-              href="/how-it-works"
+              href="/"
               className="inline-flex items-center gap-2.5 bg-white border border-slate-200 hover:bg-slate-100 text-slate-700 dark:bg-slate-900 dark:border-slate-800 dark:text-slate-300 text-xs font-bold px-5 py-3.5 rounded-xl transition-all duration-300 shadow-sm font-poppins"
             >
               <div className="flex h-5 w-5 items-center justify-center rounded-full bg-teal-50 dark:bg-slate-800 text-[#0F766E] dark:text-teal-400">

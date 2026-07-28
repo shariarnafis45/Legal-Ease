@@ -1,15 +1,10 @@
-import { getLawyerHiringRequestHistory } from '@/lib/api/hire';
-import { getUserSession } from '@/lib/core/session';
-import React from 'react';
+import { getUserSession } from "@/lib/core/session";
+import LawyerHiringHistoryWrapper from "./LawyerHiringHistoryWrapper";
+import { getLawyerHiringRequestHistory } from "@/lib/api/hire";
 
-const LawyerHiringHistoryPage = async() => {
-    const user = await getUserSession()
-    const hiringRequestHistory = await getLawyerHiringRequestHistory(user?.id)
-    return (
-        <div>
-            LawyerHiringHistoryPage
-        </div>
-    );
-};
+export default async function LawyerHiringHistoryPage() {
+  const lawyer = await getUserSession();
+  const requests = await getLawyerHiringRequestHistory(lawyer?.id);
 
-export default LawyerHiringHistoryPage;
+  return <LawyerHiringHistoryWrapper initialRequests={requests} />;
+}

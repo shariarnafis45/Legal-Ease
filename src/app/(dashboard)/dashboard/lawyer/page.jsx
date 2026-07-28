@@ -185,7 +185,7 @@ export default async function LawyerDashboard() {
             </p>
           </div>
           <Link
-            href="/dashboard/lawyer/requests"
+            href="/dashboard/lawyer/hiring-history"
             className="inline-flex items-center gap-2 text-xs font-bold text-teal-600 dark:text-teal-400 hover:text-teal-700 dark:hover:text-teal-300 transition-colors"
           >
             View All Requests <ArrowRight size={14} />
