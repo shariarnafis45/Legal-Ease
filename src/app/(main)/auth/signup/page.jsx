@@ -187,7 +187,6 @@ export default function SignUpPage() {
 
   return (
     <div className="min-h-screen w-full relative flex items-center justify-center overflow-hidden transition-colors duration-500 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-slate-100 via-slate-50 to-slate-200 dark:from-[#0e172a] dark:via-[#050B14] dark:to-[#020617]">
-      <Toaster position="top-center" />
 
       <div className="absolute top-[-10%] left-[-10%] w-[40vw] h-[40vw] bg-teal-400/20 dark:bg-teal-600/10 rounded-full blur-[120px] pointer-events-none mix-blend-multiply dark:mix-blend-lighten"></div>
       <div className="absolute bottom-[-10%] right-[-10%] w-[35vw] h-[35vw] bg-blue-400/20 dark:bg-blue-600/10 rounded-full blur-[100px] pointer-events-none mix-blend-multiply dark:mix-blend-lighten"></div>
